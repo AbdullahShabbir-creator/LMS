@@ -1,0 +1,338 @@
+/* Instructor Analytics Styles */
+.instructor-analytics-page {
+  font-family: 'Poppins', 'Urbanist', 'DM Sans', Arial, sans-serif;
+  background: linear-gradient(135deg, #232526 0%, #6c63ff 100%);
+  min-height: 100vh;
+  color: #fff;
+}
+
+.analytics-main {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+/* Header styling */
+.analytics-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.analytics-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: linear-gradient(120deg, #fff 0%, #a18cd1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+}
+
+.analytics-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.period-selector {
+  display: flex;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.period-selector button {
+  background: transparent;
+  border: none;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.period-selector button.active {
+  background: #6c63ff;
+  box-shadow: 0 0 10px rgba(108, 99, 255, 0.5);
+}
+
+.export-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(90deg, rgba(67, 206, 162, 1) 0%, rgba(24, 90, 157, 1) 100%);
+  border: none;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.export-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(67, 206, 162, 0.3);
+}
+
+/* Tabs styling */
+.analytics-tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 0.5rem;
+  overflow-x: auto;
+}
+
+.analytics-tabs button {
+  background: transparent;
+  border: none;
+  color: #e0e0e0;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px 8px 0 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.analytics-tabs button.active {
+  background: rgba(108, 99, 255, 0.2);
+  color: #fff;
+  box-shadow: 0 -4px 10px rgba(108, 99, 255, 0.1);
+  border-bottom: 3px solid #6c63ff;
+}
+
+.analytics-tabs button:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+}
+
+/* Stats grid */
+.analytics-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.analytics-stat-card {
+  background: rgba(44, 62, 80, 0.75);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.analytics-stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 30px rgba(108, 99, 255, 0.2);
+}
+
+.stat-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.student-icon {
+  background: linear-gradient(135deg, rgba(108, 99, 255, 1) 0%, rgba(161, 140, 209, 1) 100%);
+}
+
+.course-icon {
+  background: linear-gradient(135deg, rgba(67, 206, 162, 1) 0%, rgba(24, 90, 157, 1) 100%);
+}
+
+.earnings-icon {
+  background: linear-gradient(135deg, rgba(246, 211, 101, 1) 0%, rgba(253, 160, 133, 1) 100%);
+}
+
+.engagement-icon {
+  background: linear-gradient(135deg, rgba(255, 107, 107, 1) 0%, rgba(255, 168, 168, 1) 100%);
+}
+
+.stat-content {
+  flex: 1;
+}
+
+.stat-content h3 {
+  font-size: 0.9rem;
+  color: #e0e0e0;
+  margin: 0 0 0.5rem 0;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* Charts grid */
+.analytics-charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.analytics-chart-card {
+  background: rgba(44, 62, 80, 0.75);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  height: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+.analytics-chart-card h3 {
+  font-size: 1.2rem;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #fff;
+  font-weight: 600;
+}
+
+.chart-container {
+  flex: 1;
+  position: relative;
+  min-height: 300px;
+  overflow: hidden;
+}
+
+/* Loading spinner */
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  border-top-color: #6c63ff;
+  animation: spin 1s ease-in-out infinite;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes spin {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Analytics engagement section */
+.analytics-engagement {
+  min-height: 400px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .analytics-header h1 {
+    font-size: 2rem;
+  }
+  
+  .analytics-charts-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .analytics-chart-card {
+    height: 350px;
+  }
+}
+
+@media (max-width: 768px) {
+  .analytics-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .analytics-header h1 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+  }
+  
+  .analytics-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .period-selector button {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+  }
+  
+  .export-btn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+  }
+  
+  .analytics-stats-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+  
+  .stat-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+  
+  .stat-value {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .analytics-main {
+    padding: 1.5rem 1rem;
+  }
+  
+  .analytics-header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .analytics-tabs {
+    gap: 0.5rem;
+  }
+  
+  .analytics-tabs button {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+  
+  .analytics-stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .analytics-stat-card {
+    padding: 1rem;
+  }
+  
+  .analytics-chart-card {
+    padding: 1rem;
+    height: 300px;
+  }
+  
+  .analytics-chart-card h3 {
+    font-size: 1rem;
+  }
+} 

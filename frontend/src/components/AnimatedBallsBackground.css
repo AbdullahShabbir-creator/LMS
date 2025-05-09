@@ -1,0 +1,16 @@
+.animated-balls-bg {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 1;
+  background: transparent;
+}
+
+/* Make sure page content is above balls */
+.explore-courses-main-layout > *:not(.animated-balls-bg) {
+  position: relative;
+  z-index: 1;
+}

@@ -1,0 +1,37 @@
+.animated-balls-bg {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  z-index: -1;
+  overflow: hidden;
+  background: linear-gradient(120deg, #1e3c72 0%, #2a5298 100%);
+}
+.animated-ball {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.33;
+  animation: moveBall 20s ease-in-out infinite alternate;
+}
+.ball1 { width: 110px; height: 110px; background: #ff6f61; left: 12vw; top: 18vh; animation-delay: 0s; }
+.ball2 { width: 85px; height: 85px; background: #ffd700; left: 65vw; top: 23vh; animation-delay: 2s; }
+.ball3 { width: 95px; height: 95px; background: #43e97b; left: 48vw; top: 65vh; animation-delay: 4s; }
+.ball4 { width: 70px; height: 70px; background: #38a1db; left: 80vw; top: 78vh; animation-delay: 6s; }
+.ball5 { width: 100px; height: 100px; background: #a18cd1; left: 27vw; top: 60vh; animation-delay: 8s; }
+@keyframes moveBall {
+  0% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-55px) scale(1.1); }
+  100% { transform: translateY(70px) scale(0.93); }
+}
+
+/* Medium content sizing for home page */
+.instructor-home-main {
+  max-width: 1020px;
+  margin: 0 auto;
+  padding: 2.2rem 1.2rem 2.2rem 1.2rem;
+}
+
+@media (max-width: 1200px) {
+  .instructor-home-main { max-width: 92vw; }
+}
+@media (max-width: 800px) {
+  .instructor-home-main { max-width: 99vw; padding: 1.2rem 0.2rem; }
+}

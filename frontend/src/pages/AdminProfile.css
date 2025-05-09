@@ -1,0 +1,1053 @@
+.admin-profile-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: 'Inter', sans-serif;
+}
+
+.admin-profile-header {
+  margin-bottom: 30px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 15px;
+}
+
+.admin-profile-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 5px;
+  color: #f0f0f0;
+}
+
+.admin-profile-header p {
+  color: #888;
+  font-size: 16px;
+}
+
+.admin-profile-content {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 20px;
+}
+
+.admin-profile-card {
+  background: rgba(30, 30, 40, 0.85);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  height: fit-content;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.admin-profile-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+}
+
+.profile-avatar-container {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  margin: 0 auto 20px;
+}
+
+.profile-avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #3a75c4;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.avatar-upload-btn {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  background: #3a75c4;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s, background 0.2s;
+}
+
+.avatar-upload-btn:hover {
+  transform: scale(1.1);
+  background: #2c5da0;
+}
+
+.profile-info-list {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+}
+
+.profile-info-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  color: black;
+}
+
+.profile-info-item svg {
+  margin-right: 12px;
+  min-width: 20px;
+  color: #3a75c4;
+}
+
+.profile-bio {
+  margin-top: 20px;
+  color: #bbb;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.profile-actions {
+  margin-top: 25px;
+  display: flex;
+  justify-content: center;
+}
+
+.profile-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin: 0 8px;
+}
+
+.edit-btn {
+  background: #3a75c4;
+  color: white;
+}
+
+.edit-btn:hover {
+  background: #2c5da0;
+}
+
+.save-btn {
+  background: #2ecc71;
+  color: white;
+}
+
+.save-btn:hover {
+  background: #27ae60;
+}
+
+.cancel-btn {
+  background: rgba(255, 255, 255, 0.1);
+  color: #f0f0f0;
+}
+
+.cancel-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.profile-action-btn svg {
+  margin-right: 8px;
+}
+
+/* Profile tabs and forms */
+.profile-tabs {
+  display: flex;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 20px;
+}
+
+.profile-tab {
+  padding: 12px 20px;
+  cursor: pointer;
+  color: #888;
+  position: relative;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.profile-tab.active {
+  color: #3a75c4;
+}
+
+.profile-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: #3a75c4;
+}
+
+.tab-content {
+  padding: 20px 0;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #bbb;
+  font-weight: 500;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px 15px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(20, 20, 30, 0.5);
+  color: #f0f0f0;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #3a75c4;
+  box-shadow: 0 0 0 2px rgba(58, 117, 196, 0.3);
+}
+
+textarea.form-control {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.skills-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.skill-badge {
+  background: rgba(58, 117, 196, 0.2);
+  border: 1px solid rgba(58, 117, 196, 0.4);
+  color: #3a75c4;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s;
+}
+
+.skill-badge:hover {
+  background: rgba(58, 117, 196, 0.3);
+}
+
+.skill-badge .remove-skill {
+  margin-left: 5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.add-skill-input {
+  display: flex;
+  margin-top: 15px;
+}
+
+.add-skill-input input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px 0 0 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(20, 20, 30, 0.5);
+  color: #f0f0f0;
+}
+
+.add-skill-input button {
+  padding: 10px 15px;
+  background: #3a75c4;
+  color: white;
+  border: none;
+  border-radius: 0 8px 8px 0;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.add-skill-input button:hover {
+  background: #2c5da0;
+}
+
+/* Password strength meter */
+.password-strength {
+  margin-top: 10px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+  overflow: hidden;
+  position: relative;
+}
+
+.password-strength-meter {
+  height: 100%;
+  border-radius: 5px;
+  transition: width 0.5s, background 0.5s;
+}
+
+.password-strength-text {
+  font-size: 12px;
+  margin-top: 5px;
+  display: block;
+}
+
+.weak { background: #e74c3c; width: 25%; }
+.medium { background: #f39c12; width: 50%; }
+.good { background: #3498db; width: 75%; }
+.strong { background: #2ecc71; width: 100%; }
+
+/* Responsive styles */
+@media (max-width: 992px) {
+  .admin-profile-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .admin-profile-card {
+    margin-bottom: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .profile-tabs {
+    flex-wrap: wrap;
+  }
+  
+  .profile-tab {
+    flex: 1;
+    text-align: center;
+    font-size: 14px;
+    padding: 10px;
+  }
+  
+  .form-row {
+    flex-direction: column;
+  }
+  
+  .form-group.half {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-profile-header h1 {
+    font-size: 24px;
+  }
+  
+  .profile-avatar-container {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .profile-action-btn {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+}
+
+/* Loading spinner */
+.admin-profile-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(58, 117, 196, 0.3);
+  border-radius: 50%;
+  border-top-color: #3a75c4;
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 15px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Animation for tab transitions */
+.tab-content-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.tab-content-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.tab-content-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.tab-content-exit-active {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 300ms, transform 300ms;
+}
+
+/* Password input with show/hide toggle */
+.password-input-wrapper {
+  position: relative;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.password-toggle:hover {
+  color: #3a75c4;
+}
+
+.password-mismatch {
+  color: #e74c3c;
+  font-size: 12px;
+  margin-top: 5px;
+  display: block;
+}
+
+/* Security sections */
+.security-section {
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.security-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.security-section h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #f0f0f0;
+}
+
+.mfa-description {
+  color: #bbb;
+  margin-bottom: 20px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.mfa-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(30, 30, 40, 0.5);
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mfa-indicator {
+  display: flex;
+  align-items: center;
+}
+
+.mfa-indicator-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.mfa-indicator-dot.enabled {
+  background: #2ecc71;
+  box-shadow: 0 0 8px rgba(46, 204, 113, 0.5);
+}
+
+.mfa-indicator-dot.disabled {
+  background: #e74c3c;
+  box-shadow: 0 0 8px rgba(231, 76, 60, 0.5);
+}
+
+.mfa-toggle {
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mfa-enable {
+  background: #2ecc71;
+  color: white;
+}
+
+.mfa-enable:hover {
+  background: #27ae60;
+}
+
+.mfa-disable {
+  background: #e74c3c;
+  color: white;
+}
+
+.mfa-disable:hover {
+  background: #c0392b;
+}
+
+/* Session management */
+.session-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background: rgba(30, 30, 40, 0.5);
+  border-radius: 8px;
+  margin-top: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.session-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.session-device {
+  font-weight: 500;
+  color: #f0f0f0;
+  margin-bottom: 3px;
+}
+
+.session-location {
+  color: #2ecc71;
+  font-size: 13px;
+}
+
+.session-logout {
+  padding: 6px 12px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #aaa;
+  border: none;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Certifications */
+.certifications-section {
+  margin-top: 30px;
+}
+
+.certification-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  padding: 15px;
+  background: rgba(30, 30, 40, 0.5);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.certification-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+.certification-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(58, 117, 196, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 15px;
+  color: #3a75c4;
+  flex-shrink: 0;
+}
+
+.certification-details h4 {
+  font-size: 16px;
+  margin: 0 0 5px 0;
+  color: #f0f0f0;
+  font-weight: 500;
+}
+
+.certification-details p {
+  font-size: 14px;
+  color: #bbb;
+  margin: 0;
+}
+
+.add-certification-btn {
+  margin-top: 15px;
+  padding: 10px 20px;
+  background: rgba(58, 117, 196, 0.2);
+  color: #3a75c4;
+  border: 1px solid rgba(58, 117, 196, 0.4);
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.add-certification-btn:hover {
+  background: rgba(58, 117, 196, 0.3);
+}
+
+.add-certification-btn svg {
+  margin-right: 8px;
+}
+
+/* Additional styling overrides for tab container */
+.admin-profile-tabs-container {
+  background: rgba(30, 30, 40, 0.85);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  height: fit-content;
+  overflow: hidden;
+}
+
+.profile-tabs {
+  display: flex;
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.profile-tab {
+  padding: 12px 20px;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.profile-tab svg {
+  font-size: 16px;
+}
+
+/* Profile Name & Role styling */
+.profile-name {
+  font-size: 20px;
+  font-weight: 600;
+  color: #f0f0f0;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.profile-role {
+  font-size: 14px;
+  color: #3a75c4;
+  background: rgba(58, 117, 196, 0.1);
+  padding: 3px 10px;
+  border-radius: 20px;
+  display: inline-block;
+  margin: 5px 0 15px;
+  letter-spacing: 1px;
+  font-weight: 500;
+}
+
+/* Fix tab content heights for consistent UI */
+.tab-content {
+  min-height: 400px;
+}
+
+@media (max-width: 768px) {
+  .tab-content {
+    min-height: auto;
+  }
+
+  .mfa-status {
+    flex-direction: column;
+    gap: 15px;
+    align-items: flex-start;
+  }
+  
+  .certification-item {
+    flex-direction: column;
+  }
+  
+  .certification-icon {
+    margin-bottom: 10px;
+  }
+}
+
+/* Ensure all buttons have consistent styling */
+button {
+  font-family: 'Inter', sans-serif;
+}
+
+/* Email and Theme tab styles */
+.email-settings-section,
+.theme-settings-section,
+.personal-settings-section {
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.email-settings-section:last-child,
+.theme-settings-section:last-child,
+.personal-settings-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.email-settings-section h3,
+.theme-settings-section h3,
+.personal-settings-section h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #f0f0f0;
+}
+
+.email-description,
+.theme-description,
+.personal-description {
+  color: #bbb;
+  margin-bottom: 20px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Toggle switches for email and theme settings */
+.settings-toggle-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.toggle-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background: rgba(30, 30, 40, 0.5);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.2s;
+}
+
+.toggle-item:hover {
+  background: rgba(30, 30, 40, 0.7);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-content {
+  flex: 1;
+}
+
+.toggle-content h4 {
+  color: #f0f0f0;
+  font-size: 16px;
+  margin: 0 0 5px 0;
+  font-weight: 500;
+}
+
+.toggle-content p {
+  color: #bbb;
+  font-size: 13px;
+  margin: 0;
+}
+
+.toggle-switch {
+  font-size: 28px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  min-width: 40px;
+}
+
+.toggle-switch.active {
+  color: #2ecc71;
+  text-shadow: 0 0 10px rgba(46, 204, 113, 0.5);
+}
+
+.toggle-switch:not(.active) {
+  color: #666;
+}
+
+.toggle-switch:hover {
+  transform: scale(1.1);
+}
+
+/* Color picker styling */
+.color-picker-group {
+  margin-bottom: 20px;
+}
+
+.color-picker-group label {
+  display: block;
+  color: #bbb;
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+
+.color-picker-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.color-picker {
+  width: 50px;
+  height: 50px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background: none;
+  overflow: hidden;
+}
+
+.color-picker::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.color-picker::-webkit-color-swatch {
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+}
+
+.color-value {
+  color: #f0f0f0;
+  font-family: monospace;
+  font-size: 14px;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+
+/* Animation for toggle switch */
+@keyframes toggleOn {
+  0% { transform: scale(0.8); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.toggle-switch.active svg {
+  animation: toggleOn 0.3s ease;
+}
+
+/* Responsive layouts for toggle items */
+@media (max-width: 768px) {
+  .toggle-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  
+  .toggle-switch {
+    align-self: flex-end;
+    margin-top: -30px;
+  }
+  
+  .color-picker-wrapper {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}
+
+/* Email tab specific styles */
+.email-tab-content {
+  display: block !important;
+  opacity: 1 !important;
+  width: 100%;
+  max-width: 100%;
+}
+
+.email-tab-content .email-settings-section {
+  background: rgba(30, 30, 40, 0.4);
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Personal/General tab specific styles */
+.personal-tab-content {
+  display: block !important;
+  opacity: 1 !important;
+  width: 100%;
+  max-width: 100%;
+}
+
+.personal-settings-section {
+  background: rgba(30, 30, 40, 0.4);
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.personal-settings-section h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #f0f0f0;
+}
+
+.personal-description {
+  color: #bbb;
+  margin-bottom: 20px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Improve form control contrast */
+.form-control {
+  background: rgba(20, 20, 30, 0.5);
+  color: #f0f0f0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.form-control:focus {
+  background: rgba(25, 25, 35, 0.6);
+  border-color: #3a75c4;
+  box-shadow: 0 0 0 2px rgba(58, 117, 196, 0.3);
+}
+
+.form-control:disabled {
+  background: rgba(15, 15, 25, 0.4);
+  color: #aaa;
+  cursor: not-allowed;
+} 
+
+/* //////////////////////////////////////////// */
+/* Make specific General Settings text black */
+.settings-section:first-child h3,
+.settings-section:first-child .settings-form-group label,
+.settings-section:first-child .settings-form-group.checkbox label {
+  color: black !important;
+  font-weight: 500 !important;
+}
+
+/* Make inputs in General Settings section have black text */
+.settings-section:first-child input,
+.settings-section:first-child textarea,
+.settings-section:first-child select,
+.settings-section:first-child option {
+  color: black !important;
+  background-color: white !important;
+  border: 1px solid #ccc !important;
+}
+
+/* Specifically target the General Settings heading */
+.settings-section:first-child h3 {
+  color: black !important;
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  margin-bottom: 15px !important;
+}
+
+/* Improve contrast for checkbox labels */
+.settings-form-group.checkbox label {
+  color: black !important;
+  font-weight: 500 !important;
+  margin-left: 8px !important;
+}
+
+/* Add a light background to the entire General Settings section for better readability */
+.settings-section:first-child {
+  background-color: #f5f5f5 !important;
+  border-radius: 10px !important;
+  padding: 20px !important;
+  border: 1px solid #e0e0e0 !important;
+}
+
+/* Custom CSS for General and Email Settings */
+
+/* General Settings Text - White color */
+.settings-section:first-child h3,
+.settings-section:first-child label,
+.settings-section:first-child input,
+.settings-section:first-child textarea,
+.settings-section:first-child select,
+.settings-section:first-child option {
+  color: black !important;
+}
+
+/* Email Settings Text - Black color */
+.settings-section:nth-child(2) h3,
+.settings-section:nth-child(2) label,
+.settings-section:nth-child(2) input,
+.settings-section:nth-child(2) textarea {
+  color: black !important;
+}
+
+/* Additional Personal Tab styling in AdminProfile */
+.personal-settings-section h3,
+.personal-settings-section label,
+.personal-settings-section .personal-description,
+.personal-tab-content .form-control {
+  color: black !important;
+}
+
+/* Ensure background contrast for email section */
+.settings-section:nth-child(2) {
+  background-color: #f0f0f0 !important;
+}
+
+/* Enhanced contrast for inputs in both sections */
+.settings-form-group input[type="text"],
+.settings-form-group input[type="number"],
+.settings-form-group input[type="email"],
+.settings-form-group textarea,
+.settings-form-group select {
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* White text for General Settings section inputs */
+.settings-section:first-child input,
+.settings-section:first-child textarea,
+.settings-section:first-child select {
+  background-color: rgba(30, 30, 40, 0.6) !important;
+}
+
+/* Black text for Email Settings section inputs */
+.settings-section:nth-child(2) input,
+.settings-section:nth-child(2) textarea {
+  background-color: white !important;
+}

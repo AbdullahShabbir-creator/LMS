@@ -1,0 +1,277 @@
+/* Add this to your existing CSS file */
+
+/* Bulk Video Upload Styles */
+.bulk-video-upload {
+  margin: 20px 0;
+  padding: 20px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.upload-section-title {
+  font-size: 18px;
+  margin-bottom: 16px;
+  color: #333;
+}
+
+.dropzone {
+  border: 2px dashed #d1d5db;
+  border-radius: 8px;
+  padding: 30px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: #f9fafb;
+  margin-bottom: 20px;
+}
+
+.dropzone.active {
+  border-color: #4f46e5;
+  background-color: rgba(79, 70, 229, 0.05);
+}
+
+.upload-icon {
+  font-size: 32px;
+  color: #6b7280;
+  margin-bottom: 10px;
+}
+
+.upload-text {
+  font-size: 16px;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.upload-hint {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.validation-errors {
+  background-color: #fef2f2;
+  border: 1px solid #fee2e2;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: flex-start;
+}
+
+.error-icon {
+  color: #ef4444;
+  margin-right: 12px;
+  margin-top: 4px;
+  flex-shrink: 0;
+}
+
+.error-list p {
+  margin: 4px 0;
+  color: #b91c1c;
+  font-size: 14px;
+}
+
+.video-count {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+  padding: 8px 12px;
+  background-color: #f0fdf4;
+  border-radius: 6px;
+  border: 1px solid #dcfce7;
+}
+
+.count-icon {
+  color: #22c55e;
+  margin-right: 8px;
+}
+
+.video-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.video-item {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+  background-color: white;
+  transition: all 0.3s ease;
+}
+
+.video-item:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.video-item-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.video-icon {
+  color: #6b7280;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.video-title-input {
+  flex-grow: 1;
+  border: none;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 6px 2px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.video-title-input:focus {
+  border-color: #4f46e5;
+}
+
+.remove-video-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #6b7280;
+  margin-left: 8px;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.remove-video-btn:hover {
+  color: #ef4444;
+  background-color: #fee2e2;
+}
+
+.video-details {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 12px;
+}
+
+.video-preview {
+  width: 100%;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  background-color: #f3f4f6;
+  max-height: 180px;
+}
+
+.video-position {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  background-color: #f3f4f6;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.position-label {
+  font-weight: 500;
+  margin-right: 4px;
+}
+
+.position-number {
+  font-weight: 600;
+  color: #4f46e5;
+  margin-right: 8px;
+}
+
+.position-hint {
+  color: #6b7280;
+  font-size: 12px;
+  width: 100%;
+  margin-top: 4px;
+}
+
+.upload-tips {
+  background-color: #eff6ff;
+  border: 1px solid #dbeafe;
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #1e40af;
+  margin-top: 16px;
+}
+
+.upload-tips p {
+  margin: 6px 0;
+}
+
+/* Status indicators */
+.video-status {
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+  padding: 0 8px;
+}
+
+.status-icon {
+  margin-right: 5px;
+  font-size: 14px;
+}
+
+.status-icon.spinning {
+  animation: spin 1.5s linear infinite;
+  color: #4285f4;
+}
+
+.status-icon.success {
+  color: #0cbc87;
+}
+
+.status-icon.error {
+  color: #d6293e;
+}
+
+.status-text {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-text.uploading {
+  color: #4285f4;
+}
+
+.status-text.success {
+  color: #0cbc87;
+}
+
+.status-text.error {
+  color: #d6293e;
+}
+
+/* Video item status states */
+.video-item.uploading {
+  border-color: #4285f4;
+  background-color: rgba(66, 133, 244, 0.05);
+}
+
+.video-item.success {
+  border-color: #0cbc87;
+  background-color: rgba(12, 188, 135, 0.05);
+}
+
+.video-item.error {
+  border-color: #d6293e;
+  background-color: rgba(214, 41, 62, 0.05);
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Make the button disabled when uploading */
+.remove-video-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+} 
