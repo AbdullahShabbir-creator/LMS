@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import AuthLayout from '../components/AuthLayout';
-import axios from 'axios';
+import { api } from '../config/api';
 import { useNavigate } from 'react-router-dom';
 import '@fontsource/poppins';
 import '@fontsource/roboto';
@@ -79,9 +79,14 @@ export default function Login({ onLogin }) {
         // MFA verification required
         setMfaRequired(true);
         setPendingUser(result.user);
-        await axios.post('/api/mfa/send-otp', { email: form.email });
+        try {
+          await api.post('/api/mfa/send-otp', { email: form.email });
+          toast.info('OTP sent to your email.', { autoClose: 3000 });
+        } catch (error) {
+          console.error('Error sending OTP:', error);
+          toast.error('Failed to send OTP. Please try again.');
+        }
         setStep(2);
-        toast.info('OTP sent to your email.', { autoClose: 3000 });
       } 
       else {
         // Login failed
@@ -111,14 +116,14 @@ export default function Login({ onLogin }) {
     setOtpError('');
     try {
       // Verify OTP
-      const otpResponse = await axios.post('/api/mfa/verify-otp', { email: form.email, otp });
+      const otpResponse = await api.post('/api/mfa/verify-otp', { email: form.email, otp });
       
       if (!otpResponse.data.success) {
         throw new Error('OTP verification failed');
       }
       
       // After successful OTP verification, login directly using JWT
-      const loginResponse = await axios.post('/api/auth/login', {
+      const loginResponse = await api.post('/api/auth/login', {
         email: form.email,
         password: form.password,
         role: form.role,
@@ -161,7 +166,7 @@ export default function Login({ onLogin }) {
     setResendLoading(true);
     setOtpError('');
     try {
-      await axios.post('/api/mfa/send-otp', { email: form.email });
+      await api.post('/api/mfa/send-otp', { email: form.email });
       setResendTimer(60);
       toast.info('OTP resent to your email.', { autoClose: 3000 });
     } catch (err) {
