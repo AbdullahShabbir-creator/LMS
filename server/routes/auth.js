@@ -50,37 +50,29 @@ const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey';
 function auth(req, res, next) {
   console.log('Auth check middleware triggered');
   const authHeader = req.headers.authorization;
-  console.log('Authorization header:', authHeader || 'None');
-  
-  // Development mode - skip authentication when NODE_ENV is development
-  if (process.env.NODE_ENV === 'development' && process.env.SKIP_AUTH === 'true') {
+  console.log('Authorization header:', authHeader ? authHeader.split(' ')[1] : 'None');
+
+  // If we're in development mode, skip auth verification
+  if (process.env.NODE_ENV === 'development') {
     console.log('Development mode: Skipping auth verification');
-    req.user = { 
-      _id: 'dev-user-123', 
+    // Create a proper MongoDB ObjectId for the demo user
+    const demoUserId = new mongoose.Types.ObjectId();
+    req.user = {
+      _id: demoUserId,
+      id: demoUserId,
+      email: 'dev@example.com',
       role: 'instructor',
-      email: 'dev@example.com'
+      name: 'Development Instructor'
     };
     return next();
   }
-  
-  // More flexible token extraction
-  let token;
-  if (authHeader) {
-    if (authHeader.startsWith('Bearer ')) {
-      token = authHeader.split(' ')[1];
-    } else {
-      // In case the "Bearer " prefix is missing, use the whole header
-      token = authHeader;
-    }
+
+  if (!authHeader) {
+    return res.status(401).json({ message: 'No token provided' });
   }
-  
-  if (!token) {
-    console.log('No token provided');
-    return res.status(401).json({ message: 'No token, authorization denied' });
-  }
-  
+
+  const token = authHeader.split(' ')[1];
   try {
-    console.log('Verifying token:', token.substring(0, 20) + '...');
     const decoded = jwt.verify(token, JWT_SECRET);
     console.log('Token verified, user:', decoded);
     req.user = decoded;

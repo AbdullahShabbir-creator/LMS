@@ -8,7 +8,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
+  origin: 'http://localhost:3000',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -27,15 +27,23 @@ console.log('Attempting to connect to MongoDB at:', MONGO_URI);
 mongoose.connect(MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-  serverSelectionTimeoutMS: 10000, // Timeout after 10s instead of 30s
+  serverSelectionTimeoutMS: 10000,
   connectTimeoutMS: 10000,
   socketTimeoutMS: 45000,
-  family: 4 // Use IPv4, skip trying IPv6
+  family: 4
 })
-.then(() => console.log('MongoDB connected successfully'))
+.then(() => {
+  console.log('MongoDB connected successfully');
+  // Add a check to ensure the connection is actually usable
+  mongoose.connection.on('error', (err) => {
+    console.error('MongoDB connection error:', err);
+    process.exit(1); // Exit if connection fails
+  });
+})
 .catch((err) => {
-  console.error('MongoDB connection error:', err);
-  console.log('Continuing without database connection - using fallback authentication system');
+  console.error('Failed to connect to MongoDB:', err);
+  console.error('Please ensure MongoDB is running and accessible at:', MONGO_URI);
+  process.exit(1); // Exit if connection fails
 });
 
 // Add a DB connection status route for troubleshooting

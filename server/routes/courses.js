@@ -57,7 +57,29 @@ router.get('/:id', auth, requireRole('admin'), async (req, res) => {
 // Create a course (instructor)
 router.post('/', auth, requireRole('instructor'), async (req, res) => {
   try {
-    const { title, instructor, category, description, price, isFree, paymentMethod, jazzCashNumber, meezanBankAccount } = req.body;
+    const { title, category, description, price, isFree, paymentMethod, jazzCashNumber, meezanBankAccount } = req.body;
+    
+    // Validate required fields
+    if (!title || !category || !description) {
+      return res.status(400).json({ message: 'Missing required fields: title, category, and description are required' });
+    }
+
+    // Set instructor to the current authenticated user
+    const instructor = req.user._id;
+
+    // Validate payment information if course is not free
+    if (!isFree) {
+      if (!paymentMethod || !['JazzCash', 'MeezanBank'].includes(paymentMethod)) {
+        return res.status(400).json({ message: 'Invalid payment method' });
+      }
+      if (paymentMethod === 'JazzCash' && !jazzCashNumber) {
+        return res.status(400).json({ message: 'JazzCash number is required for JazzCash payment method' });
+      }
+      if (paymentMethod === 'MeezanBank' && !meezanBankAccount) {
+        return res.status(400).json({ message: 'Meezan Bank account is required for Meezan Bank payment method' });
+      }
+    }
+
     const course = await Course.create({
       title,
       instructor,
@@ -69,9 +91,14 @@ router.post('/', auth, requireRole('instructor'), async (req, res) => {
       jazzCashNumber: paymentMethod === 'JazzCash' ? jazzCashNumber : undefined,
       meezanBankAccount: paymentMethod === 'MeezanBank' ? meezanBankAccount : undefined
     });
+
     res.status(201).json(course);
   } catch (err) {
-    res.status(500).json({ message: 'Server error' });
+    console.error('Course creation error:', err);
+    if (err.name === 'ValidationError') {
+      return res.status(400).json({ message: 'Validation error', errors: err.errors });
+    }
+    res.status(500).json({ message: 'Server error', error: err.message });
   }
 });
 

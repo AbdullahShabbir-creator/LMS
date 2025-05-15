@@ -81,7 +81,7 @@ export default function InstructorUpload() {
     
     if (!token) return;
 
-    fetch('/api/instructor/courses', {
+    fetch('http://localhost:5000/api/instructor/courses', {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => res.ok ? res.json() : Promise.reject('Failed to fetch courses'))

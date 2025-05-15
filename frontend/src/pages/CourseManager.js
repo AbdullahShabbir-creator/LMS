@@ -7,6 +7,8 @@ import ReactPlayer from 'react-player';
 import { FaPlus, FaTrash, FaEdit, FaVideo, FaEye } from 'react-icons/fa';
 import '../styles/course.manager.css';
 
+const API_BASE_URL = 'http://localhost:5000';
+
 const initialCourses = [
   {
     id: 1,
@@ -41,7 +43,7 @@ async function uploadVideoToFirebase(file) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
     
-    const res = await fetch('/api/upload', {
+    const res = await fetch(`${API_BASE_URL}/api/upload`, {
       method: 'POST',
       body: formData,
       credentials: 'include',
@@ -94,17 +96,30 @@ export default function CourseManager() {
   // Fetch courses from backend on mount
   useEffect(() => {
     async function fetchCourses() {
-      const res = await fetch('/api/courses', { credentials: 'include' });
-      if (res.ok) {
-        const data = await res.json();
-        setCourses(data);
+      try {
+        const user = localStorage.getItem('user');
+        const isAuth = user && JSON.parse(user).role === 'instructor';
+        
+        const endpoint = isAuth ? `${API_BASE_URL}/api/courses` : `${API_BASE_URL}/api/courses/public`;
+        const res = await fetch(endpoint, {
+          credentials: 'include',
+          headers: isAuth ? {
+            'Authorization': `Bearer ${JSON.parse(user).token}`
+          } : {}
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setCourses(data);
+        }
+      } catch (error) {
+        console.error('Error fetching courses:', error);
       }
     }
     fetchCourses();
   }, []);
 
   async function handleDeleteCourse(id) {
-    const res = await fetch(`/api/courses/${id}`, {
+    const res = await fetch(`${API_BASE_URL}/api/courses/${id}`, {
       method: 'DELETE',
       credentials: 'include',
     });
@@ -208,12 +223,24 @@ export default function CourseManager() {
         };
       });
 
+      // Get user ID from localStorage
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (!user || !user._id) {
+        throw new Error('User not authenticated');
+      }
+
       const courseData = {
         title: form.title.trim(),
         description: form.description.trim(),
-        instructor: 'INSTRUCTOR_ID',
+        instructor: user._id,
         category: form.category,
-        curriculum: lecturesWithVideo,
+        curriculum: lecturesWithVideo.map(lec => ({
+          title: lec.title,
+          isPreview: lec.isPreview || false,
+          videoUrl: lec.videoUrl || '',
+          videoPublicId: lec.videoPublicId || '',
+          videoName: lec.videoName || ''
+        })),
         price: form.isFree ? 0 : parseFloat(form.price),
         isFree: form.isFree,
         paymentMethod: form.isFree ? 'None' : form.paymentMethod,
@@ -223,14 +250,14 @@ export default function CourseManager() {
       
       let res;
       if (editingCourseId) {
-        res = await fetch(`/api/courses/${editingCourseId}`, {
+        res = await fetch(`${API_BASE_URL}/api/courses/${editingCourseId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
           body: JSON.stringify(courseData)
         });
       } else {
-        res = await fetch('/api/courses', {
+        res = await fetch(`${API_BASE_URL}/api/courses`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',

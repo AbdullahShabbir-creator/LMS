@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+const API_BASE_URL = 'http://localhost:5000';
 import InstructorHeader from '../components/InstructorHeader';
 import InstructorFooter from '../components/InstructorFooter';
 import { ToastContainer, toast } from 'react-toastify';
@@ -30,7 +31,7 @@ export default function InstructorUploadCourse() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await fetch('/api/courses', {
+      const res = await fetch(`${API_BASE_URL}/api/courses`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
