@@ -105,7 +105,7 @@ router.post('/', auth, requireRole('instructor'), async (req, res) => {
 // Edit a course (instructor)
 router.put('/:id', auth, requireRole('instructor'), async (req, res) => {
   try {
-    const { title, instructor, category, description, price, isFree, paymentMethod, jazzCashNumber, meezanBankAccount } = req.body;
+    const { title, instructor, category, description, price, isFree, paymentMethod, jazzCashNumber, meezanBankAccount, curriculum } = req.body;
     const course = await Course.findByIdAndUpdate(
       req.params.id,
       {
@@ -117,7 +117,8 @@ router.put('/:id', auth, requireRole('instructor'), async (req, res) => {
         isFree,
         paymentMethod: isFree ? 'None' : paymentMethod,
         jazzCashNumber: paymentMethod === 'JazzCash' ? jazzCashNumber : undefined,
-        meezanBankAccount: paymentMethod === 'MeezanBank' ? meezanBankAccount : undefined
+        meezanBankAccount: paymentMethod === 'MeezanBank' ? meezanBankAccount : undefined,
+        curriculum: curriculum || []
       },
       { new: true }
     );

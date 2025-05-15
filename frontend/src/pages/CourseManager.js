@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import InstructorHeader from '../components/InstructorHeader';
 import InstructorFooter from '../components/InstructorFooter';
 import CurriculumBuilder from '../components/CurriculumBuilder';
 import BulkVideoUpload from '../components/BulkVideoUpload';
 import ReactPlayer from 'react-player';
 import { FaPlus, FaTrash, FaEdit, FaVideo, FaEye } from 'react-icons/fa';
+import { toast } from 'react-toastify';
 import '../styles/course.manager.css';
 
 const API_BASE_URL = 'http://localhost:5000';
@@ -75,7 +76,7 @@ async function uploadVideoToFirebase(file) {
 }
 
 export default function CourseManager() {
-  const [courses, setCourses] = useState(initialCourses);
+  const [courses, setCourses] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ 
     title: '', 
@@ -93,30 +94,40 @@ export default function CourseManager() {
   const [uploading, setUploading] = useState(false);
   const [editingCourseId, setEditingCourseId] = useState(null);
 
-  // Fetch courses from backend on mount
-  useEffect(() => {
-    async function fetchCourses() {
-      try {
-        const user = localStorage.getItem('user');
-        const isAuth = user && JSON.parse(user).role === 'instructor';
-        
-        const endpoint = isAuth ? `${API_BASE_URL}/api/courses` : `${API_BASE_URL}/api/courses/public`;
-        const res = await fetch(endpoint, {
-          credentials: 'include',
-          headers: isAuth ? {
-            'Authorization': `Bearer ${JSON.parse(user).token}`
-          } : {}
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setCourses(data);
+  // Function to fetch courses from backend
+  const fetchCourses = useCallback(async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_BASE_URL}/api/courses/instructor`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
         }
-      } catch (error) {
-        console.error('Error fetching courses:', error);
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch courses');
       }
+
+      const data = await response.json();
+      setCourses(data.courses || []);
+      console.log('Courses fetched successfully:', data.courses);
+    } catch (error) {
+      console.error('Error fetching courses:', error);
+      console.error('Failed to load courses. Please check your network connection and try again.');
     }
-    fetchCourses();
   }, []);
+
+  // Fetch courses on mount and set up refresh interval
+  useEffect(() => {
+    // Fetch courses when component mounts
+    fetchCourses();
+
+    // Set up interval to refresh courses every 30 seconds
+    const interval = setInterval(fetchCourses, 30000);
+
+    // Clean up interval on unmount
+    return () => clearInterval(interval);
+  }, [fetchCourses]);
 
   async function handleDeleteCourse(id) {
     const res = await fetch(`${API_BASE_URL}/api/courses/${id}`, {
@@ -239,7 +250,7 @@ export default function CourseManager() {
           isPreview: lec.isPreview || false,
           videoUrl: lec.videoUrl || '',
           videoPublicId: lec.videoPublicId || '',
-          videoName: lec.videoName || ''
+          createdAt: new Date()
         })),
         price: form.isFree ? 0 : parseFloat(form.price),
         isFree: form.isFree,
@@ -271,11 +282,17 @@ export default function CourseManager() {
       }
       
       const saved = await res.json();
+      // Update local state and trigger a refresh
       if (editingCourseId) {
-        setCourses(courses.map(c => (c._id === editingCourseId || c.id === editingCourseId) ? saved : c));
+        setCourses(prev => prev.map(c => (c._id === editingCourseId || c.id === editingCourseId) ? saved : c));
       } else {
-        setCourses([...courses, saved]);
+        setCourses(prev => [...prev, saved]);
       }
+      
+      // Refresh the course list to ensure we have the latest data
+      await fetchCourses();
+      // Force a re-render to update the UI
+      setCourses(prev => [...prev]);
       
       // Reset form
       setShowForm(false);
