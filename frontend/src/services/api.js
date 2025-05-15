@@ -2,7 +2,7 @@
 import { toast } from 'react-toastify';
 import { getToken as getAuthToken } from '../utils/auth';
 
-const API_URL = '';  // Base URL is empty for relative paths
+const API_URL = 'http://localhost:5000';  // Set the correct API base URL
 
 // Fetch all available courses
 export const getAllCourses = async () => {

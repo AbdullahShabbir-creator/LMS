@@ -15,16 +15,16 @@ import { getToken as getAuthToken } from '../utils/auth';
 // Add this utility function at the top of the file, before the component definition
 const getPlaceholderImage = (category) => {
   const categories = {
-    'Web Development': 'https://source.unsplash.com/random/300×200/?coding',
-    'Programming': 'https://source.unsplash.com/random/300×200/?programming',
-    'Design': 'https://source.unsplash.com/random/300×200/?design',
-    'Business': 'https://source.unsplash.com/random/300×200/?business',
-    'Marketing': 'https://source.unsplash.com/random/300×200/?marketing',
-    'Photography': 'https://source.unsplash.com/random/300×200/?photography',
-    'Music': 'https://source.unsplash.com/random/300×200/?music',
-    'Health': 'https://source.unsplash.com/random/300×200/?health',
-    'Science': 'https://source.unsplash.com/random/300×200/?science',
-    'Language': 'https://source.unsplash.com/random/300×200/?language',
+    'Web Development': 'https://source.unsplash.com/random/300x200/?coding',
+    'Programming': 'https://source.unsplash.com/random/300x200/?programming',
+    'Design': 'https://source.unsplash.com/random/300x200/?design',
+    'Business': 'https://source.unsplash.com/random/300x200/?business',
+    'Marketing': 'https://source.unsplash.com/random/300x200/?marketing',
+    'Photography': 'https://source.unsplash.com/random/300x200/?photography',
+    'Music': 'https://source.unsplash.com/random/300x200/?music',
+    'Health': 'https://source.unsplash.com/random/300x200/?health',
+    'Science': 'https://source.unsplash.com/random/300x200/?science',
+    'Language': 'https://source.unsplash.com/random/300x200/?language',
   };
   
   return categories[category] || `https://source.unsplash.com/random/300×200/?${category || 'education'}`;
@@ -51,98 +51,57 @@ export default function StudentMyCourses() {
     setError('');
     
     try {
-      // Fetch free courses
-      const { courses: freeCourses, error: freeCoursesError } = await getFreeCourses();
+      // Fetch both free and enrolled courses in parallel
+      const [freeCoursesResult, enrolledCoursesResult] = await Promise.all([
+        getFreeCourses(),
+        getEnrolledCourses()
+      ]);
+
+      const freeCourses = freeCoursesResult.courses || [];
+      const freeCoursesError = freeCoursesResult.error;
+      const enrolledCourses = enrolledCoursesResult.courses || [];
+      const enrolledCoursesError = enrolledCoursesResult.error;
       
-      if (freeCoursesError) {
-        console.error('Error fetching free courses:', freeCoursesError);
-        toast.warning(`Note: ${freeCoursesError}`);
-      }
+      // Combine free and enrolled courses
+      let allMyCourses = [...freeCourses];
       
-      // Fetch enrolled courses
-      const { courses: enrolledCourses, error: enrolledCoursesError } = await getEnrolledCourses();
+      // Add enrolled courses, ensuring no duplicates
+      enrolledCourses.forEach(course => {
+        // Check if course already exists in the list
+        const existingCourse = allMyCourses.find(c => c._id === course._id);
+        if (existingCourse) {
+          // Update existing course with enrolled status
+          existingCourse.enrolled = true;
+        } else {
+          // Add new course with enrolled status
+          allMyCourses.push({
+            ...course,
+            enrolled: true
+          });
+        }
+      });
       
-      if (enrolledCoursesError) {
-        console.error('Error fetching enrolled courses:', enrolledCoursesError);
-        toast.warning(`Note: ${enrolledCoursesError}`);
-      }
-      
-      // Combine the courses and remove duplicates
-      let allMyCourses = [];
-      
-      if (freeCourses && Array.isArray(freeCourses)) {
-        allMyCourses = [...freeCourses];
-      }
-      
-      if (enrolledCourses && Array.isArray(enrolledCourses)) {
-        // Add enrolled courses and mark them as enrolled
-        enrolledCourses.forEach(course => {
-          if (!allMyCourses.some(c => c._id === course._id)) {
-            allMyCourses.push({
-              ...course,
-              enrolled: true
-            });
-          }
-        });
-      }
-      
-      // If no courses found, add placeholder messages
+      // If no courses found, show appropriate message
       if (allMyCourses.length === 0) {
-        console.log('No courses found from API, using sample data');
-        // Add dummy courses for demo/testing (does not affect real logic)
-        const dummyCourses = [
-          {
-            _id: 'dummy1',
-            title: 'React for Beginners',
-            category: 'Web Development',
-            instructor: { name: 'John Doe' },
-            description: 'Learn the basics of React.js and build your first web app.',
-            preview: 'Intro to React concepts and JSX.',
-            isFree: true,
-            price: 0,
-            students: [],
-            image: 'https://source.unsplash.com/random/300×200/?react',
-            content: [
-              { title: 'Introduction to React', type: 'video', url: 'https://example.com/intro.mp4', duration: '10:30' },
-              { title: 'JSX Basics', type: 'pdf', url: 'https://example.com/jsx.pdf', pages: 15 },
-              { title: 'Components & Props', type: 'quiz', questions: 5 }
-            ]
-          },
-          {
-            _id: 'dummy3',
-            title: 'UI/UX Design Fundamentals',
-            category: 'Design',
-            instructor: { name: 'Alex Lee' },
-            description: 'Understand the principles of UI/UX design for web and mobile.',
-            preview: 'Wireframing, prototyping, and usability.',
-            isFree: true,
-            price: 0,
-            students: [],
-            image: 'https://source.unsplash.com/random/300×200/?design',
-            content: [
-              { title: 'Design Thinking', type: 'video', url: 'https://example.com/design.mp4', duration: '8:20' },
-              { title: 'User Research', type: 'document', url: 'https://example.com/research.pdf', pages: 12 },
-              { title: 'Wireframing', type: 'tutorial', steps: 8 }
-            ]
-          }
-        ];
-        allMyCourses = dummyCourses;
+        console.log('No courses found from API');
       }
       
       // Process and normalize courses
-      const processedCourses = allMyCourses.map(course => {
-        return {
-          ...course,
-          // Add default image if missing
-          image: course.image || getPlaceholderImage(course.category),
-          // Add default preview if missing
-          preview: course.preview || 'No preview available for this course',
-          // Ensure category exists
-          category: course.category || 'General',
-          // Set free status
-          isFree: course.isFree || course.price === 0
-        };
-      });
+      const processedCourses = allMyCourses.map(course => ({
+        ...course,
+        // Add default values if missing
+        category: course.category || 'General',
+        instructor: course.instructor || { name: 'Instructor' },
+        rating: course.rating || 4.0,
+        students: course.students || 0,
+        image: course.image || getPlaceholderImage(course.category),
+        preview: course.preview || 'No preview available for this course',
+        isFree: course.isFree || course.price === 0,
+        price: course.price || 0,
+        enrolled: course.enrolled || false,
+        progress: course.progress || 0,
+        content: course.content || []
+      }));
       
       console.log(`Loaded ${processedCourses.length} courses for My Courses tab`);
       setCourses(processedCourses);
