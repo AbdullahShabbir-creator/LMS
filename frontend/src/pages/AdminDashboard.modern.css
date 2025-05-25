@@ -205,6 +205,48 @@ html {
   box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
 }
 
+.modern-summary-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.modern-summary-card {
+  background: rgba(40, 40, 40, 0.92);
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modern-summary-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.modern-summary-icon {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: #fbc531;
+}
+
+.modern-summary-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.modern-summary-label {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
 .dashboard-below-title {
   font-size: 1.3rem;
   font-weight: 500;

@@ -46,6 +46,53 @@ const router = express.Router();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey';
 
+// Get student count
+router.get('/students/count', auth, requireRole('admin'), async (req, res) => {
+  console.log('GET /students/count endpoint hit');
+  console.log('User making request:', req.user);
+  console.log('Headers:', req.headers);
+  
+  try {
+    const count = await User.countDocuments({ role: 'student' });
+    console.log('Found', count, 'students');
+    res.json({ 
+      success: true,
+      count,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Error fetching student count:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Error fetching student count',
+      error: error.message 
+    });
+  }
+});
+
+// Get instructor count
+router.get('/instructors/count', auth, requireRole('admin'), async (req, res) => {
+  console.log('GET /instructors/count endpoint hit');
+  console.log('User making request:', req.user);
+  
+  try {
+    const count = await User.countDocuments({ role: 'instructor' });
+    console.log('Found', count, 'instructors');
+    res.json({ 
+      success: true,
+      count,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Error fetching instructor count:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Error fetching instructor count',
+      error: error.message 
+    });
+  }
+});
+
 // Middleware: Auth check
 function auth(req, res, next) {
   console.log('Auth check middleware triggered');
@@ -61,8 +108,8 @@ function auth(req, res, next) {
       _id: demoUserId,
       id: demoUserId,
       email: 'dev@example.com',
-      role: 'instructor',
-      name: 'Development Instructor'
+      role: 'admin',  // Changed to admin for development
+      name: 'Development Admin'
     };
     return next();
   }
@@ -85,7 +132,7 @@ function auth(req, res, next) {
       console.log('Development mode: Providing test user after token failure');
       req.user = { 
         _id: 'test-fallback-user', 
-        role: 'instructor',
+        role: 'admin',  // Changed to admin for development
         email: 'test@example.com'
       };
       return next();
@@ -98,7 +145,12 @@ function auth(req, res, next) {
 // Middleware: Role check
 function requireRole(role) {
   return (req, res, next) => {
-    if (req.user.role !== role) return res.status(403).json({ message: 'Forbidden' });
+    if (!req.user || !req.user.role) {
+      return res.status(401).json({ message: 'Not authenticated' });
+    }
+    if (req.user.role !== role) {
+      return res.status(403).json({ message: 'Forbidden' });
+    }
     next();
   };
 }
@@ -115,6 +167,45 @@ router.post('/register', async (req, res) => {
   } catch (err) {
     console.error('Register error:', err); 
     res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Delete user (admin only)
+router.delete('/users/:userId', [auth, requireRole('admin')], async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    
+    // Ensure admin cannot delete themselves
+    if (req.user._id.toString() === userId) {
+      return res.status(400).json({ message: 'Cannot delete yourself' });
+    }
+    
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    // Only allow deleting students or instructors, not admins
+    if (user.role === 'admin') {
+      return res.status(403).json({ message: 'Cannot delete admin users' });
+    }
+    
+    await User.findByIdAndDelete(userId);
+    res.json({ message: 'User deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting user:', err);
+    res.status(500).json({ message: 'Failed to delete user' });
+  }
+});
+
+// Get all users (admin only)
+router.get('/users', [auth, requireRole('admin')], async (req, res) => {
+  try {
+    const users = await User.find({});
+    res.json(users);
+  } catch (err) {
+    console.error('Error fetching users:', err);
+    res.status(500).json({ message: 'Failed to fetch users' });
   }
 });
 

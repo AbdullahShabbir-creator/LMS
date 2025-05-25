@@ -10,14 +10,83 @@ import ThreeBallsBackground from '../components/ThreeBallsBackground';
 import './AdminDashboard.css';
 import './AdminDashboard.modern.css';
 
-const summaryCards = [
-  { label: 'Students', value: 1200, icon: <FaUsers /> },
-  { label: 'Instructors', value: 32, icon: <FaChalkboardTeacher /> },
-  { label: 'Courses', value: 74, icon: <FaBook /> },
-  { label: 'Revenue', value: '$24,500', icon: <FaDollarSign /> },
-];
-
 export default function AdminDashboard({ activeTab }) {
+  const [summaryCards, setSummaryCards] = React.useState([
+    { label: 'Students', value: 'Loading...', icon: <FaUsers /> },
+    { label: 'Instructors', value: 'Loading...', icon: <FaChalkboardTeacher /> },
+    { label: 'Revenue', value: '$0', icon: <FaDollarSign /> },
+  ]);
+
+  React.useEffect(() => {
+    // Fetch student count
+    const fetchStudentCount = async () => {
+      try {
+        console.log('Fetching student count...');
+        const token = localStorage.getItem('token');
+        const response = await fetch('http://localhost:5000/api/auth/students/count', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          credentials: 'include'
+        });
+        
+        const responseData = await response.json().catch(e => ({}));
+        console.log('Student count response:', responseData);
+        
+        if (response.ok && responseData.success) {
+          setSummaryCards(prevCards => {
+            const newCards = [...prevCards];
+            const studentIndex = newCards.findIndex(card => card.label === 'Students');
+            if (studentIndex !== -1) {
+              newCards[studentIndex] = { ...newCards[studentIndex], value: responseData.count };
+            }
+            return newCards;
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching student count:', error);
+      }
+    };
+
+    // Fetch instructor count
+    const fetchInstructorCount = async () => {
+      try {
+        console.log('Fetching instructor count...');
+        const token = localStorage.getItem('token');
+        const response = await fetch('http://localhost:5000/api/auth/instructors/count', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          credentials: 'include'
+        });
+        
+        const responseData = await response.json().catch(e => ({}));
+        console.log('Instructor count response:', responseData);
+        
+        if (response.ok && responseData.success) {
+          setSummaryCards(prevCards => {
+            const newCards = [...prevCards];
+            const instructorIndex = newCards.findIndex(card => card.label === 'Instructors');
+            if (instructorIndex !== -1) {
+              newCards[instructorIndex] = { ...newCards[instructorIndex], value: responseData.count };
+            }
+            return newCards;
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching instructor count:', error);
+      }
+    };
+
+    fetchStudentCount();
+    fetchInstructorCount();
+  }, []);
   const [activeMenu, setActiveMenu] = useState(activeTab || 0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();

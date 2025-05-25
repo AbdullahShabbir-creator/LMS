@@ -8,7 +8,7 @@ import { FaPlus, FaTrash, FaEdit, FaVideo, FaEye } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import '../styles/course.manager.css';
 
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = 'http://localhost:3000';
 
 const initialCourses = [
   {

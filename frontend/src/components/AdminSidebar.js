@@ -7,11 +7,6 @@ import './AdminSidebar.css';
 const menuItems = [
   { label: 'Dashboard', icon: <FaThLarge />, path: '/admin' },
   { label: 'Manage Students', icon: <FaUserGraduate />, path: '/admin/students' },
-  { label: 'Manage Instructors', icon: <FaChalkboardTeacher />, path: '/admin/instructors' },
-  { label: 'Manage Courses', icon: <FaBook />, path: '/admin/courses' },
-  { label: 'Manage Categories', icon: <FaLayerGroup />, path: '/admin/categories' },
-  { label: 'Manage Reviews', icon: <FaStar />, path: '/admin/reviews' },
-  { label: 'Manage Payments', icon: <FaMoneyBill />, path: '/admin/payments' },
   { label: 'Settings', icon: <FaCog />, path: '/admin/settings' },
   { label: 'Logout', icon: <FaSignOutAlt />, path: '/logout' },
 ];
