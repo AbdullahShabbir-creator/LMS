@@ -65,32 +65,7 @@ export default function AdminUsers() {
     setFilteredUsers(result);
   };
 
-  const toggleUserStatus = async (userId, currentStatus) => {
-    if (!window.confirm(`Are you sure you want to ${currentStatus ? 'deactivate' : 'activate'} this user?`)) return;
-    
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`/api/auth/users/${userId}/status`, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        credentials: 'include',
-        body: JSON.stringify({ isActive: !currentStatus })
-      });
 
-      if (!response.ok) throw new Error('Failed to update user status');
-      
-      // Update local state
-      setUsers(users.map(user => 
-        user._id === userId ? { ...user, isActive: !currentStatus } : user
-      ));
-    } catch (err) {
-      console.error('Error updating user status:', err);
-      setError(err.message);
-    }
-  };
 
   const deleteUser = async (userId) => {
     if (!window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) return;
@@ -192,7 +167,6 @@ export default function AdminUsers() {
               <th>Name</th>
               <th>Email</th>
               <th>Role</th>
-              <th>Status</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -212,21 +186,7 @@ export default function AdminUsers() {
                   </td>
                   <td>{user.email}</td>
                   <td>{getRoleBadge(user.role)}</td>
-                  <td>
-                    <span className={`status-badge ${user.isActive ? 'active' : 'inactive'}`}>
-                      {user.isActive ? 'Active' : 'Inactive'}
-                    </span>
-                  </td>
                   <td className="actions">
-                    <motion.button
-                      className={`action-btn ${user.isActive ? 'deactivate' : 'activate'}`}
-                      onClick={() => toggleUserStatus(user._id, user.isActive)}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      title={user.isActive ? 'Deactivate' : 'Activate'}
-                    >
-                      {user.isActive ? <FaBan /> : <FaCheck />}
-                    </motion.button>
                     <motion.button
                       className="action-btn delete"
                       onClick={() => deleteUser(user._id)}

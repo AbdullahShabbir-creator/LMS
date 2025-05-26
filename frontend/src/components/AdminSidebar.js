@@ -7,8 +7,6 @@ import './AdminSidebar.css';
 const menuItems = [
   { label: 'Dashboard', icon: <FaThLarge />, path: '/admin' },
   { label: 'Manage Users', icon: <FaUsers />, path: '/admin/users' },
-  { label: 'Manage Students', icon: <FaUserGraduate />, path: '/admin/students' },
-  { label: 'Settings', icon: <FaCog />, path: '/admin/settings' },
   { label: 'Logout', icon: <FaSignOutAlt />, path: '/logout' },
 ];
 
