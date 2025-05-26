@@ -1,11 +1,12 @@
 import React from 'react';
-import { FaUserGraduate, FaChalkboardTeacher, FaBook, FaThLarge, FaStar, FaMoneyBill, FaCog, FaSignOutAlt, FaLayerGroup, FaBars } from 'react-icons/fa';
+import { FaUserGraduate, FaChalkboardTeacher, FaBook, FaThLarge, FaStar, FaMoneyBill, FaCog, FaSignOutAlt, FaLayerGroup, FaBars, FaUsers } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import './AdminSidebar.css';
 
 const menuItems = [
   { label: 'Dashboard', icon: <FaThLarge />, path: '/admin' },
+  { label: 'Manage Users', icon: <FaUsers />, path: '/admin/users' },
   { label: 'Manage Students', icon: <FaUserGraduate />, path: '/admin/students' },
   { label: 'Settings', icon: <FaCog />, path: '/admin/settings' },
   { label: 'Logout', icon: <FaSignOutAlt />, path: '/logout' },

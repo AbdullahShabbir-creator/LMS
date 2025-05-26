@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import AdminSidebar from '../components/AdminSidebar';
 import AdminNavbar from '../components/AdminNavbar';
 import { motion } from 'framer-motion';
-import { FaUsers, FaChalkboardTeacher, FaBook, FaDollarSign } from 'react-icons/fa';
+import { FaUsers, FaChalkboardTeacher, FaBook, FaDollarSign, FaUser } from 'react-icons/fa';
 import { getUser, logout } from '../utils/auth';
 import { useNavigate, useLocation } from 'react-router-dom';
 import useMediaQuery from '../utils/useMediaQuery';
@@ -105,13 +105,14 @@ export default function AdminDashboard({ activeTab }) {
       setActiveMenu(activeTab);
     } else {
       const path = location.pathname;
-      if (path.includes("/admin/students")) setActiveMenu(1);
-      else if (path.includes("/admin/instructors")) setActiveMenu(2);
-      else if (path.includes("/admin/courses")) setActiveMenu(3);
-      else if (path.includes("/admin/categories")) setActiveMenu(4);
-      else if (path.includes("/admin/reviews")) setActiveMenu(5);
-      else if (path.includes("/admin/payments")) setActiveMenu(6);
-      else if (path.includes("/admin/settings")) setActiveMenu(7);
+      if (path.includes("/admin/users")) setActiveMenu(1);
+      else if (path.includes("/admin/students")) setActiveMenu(2);
+      else if (path.includes("/admin/instructors")) setActiveMenu(3);
+      else if (path.includes("/admin/courses")) setActiveMenu(4);
+      else if (path.includes("/admin/categories")) setActiveMenu(5);
+      else if (path.includes("/admin/reviews")) setActiveMenu(6);
+      else if (path.includes("/admin/payments")) setActiveMenu(7);
+      else if (path.includes("/admin/settings")) setActiveMenu(8);
       else setActiveMenu(0);
     }
   }, [activeTab, location.pathname]);
@@ -137,13 +138,14 @@ export default function AdminDashboard({ activeTab }) {
     
     switch(index) {
       case 0: navigate('/admin'); break;
-      case 1: navigate('/admin/students'); break;
-      case 2: navigate('/admin/instructors'); break;
-      case 3: navigate('/admin/courses'); break;
-      case 4: navigate('/admin/categories'); break;
-      case 5: navigate('/admin/reviews'); break;
-      case 6: navigate('/admin/payments'); break;
-      case 7: navigate('/admin/settings'); break;
+      case 1: navigate('/admin/users'); break;
+      case 2: navigate('/admin/students'); break;
+      case 3: navigate('/admin/instructors'); break;
+      case 4: navigate('/admin/courses'); break;
+      case 5: navigate('/admin/categories'); break;
+      case 6: navigate('/admin/reviews'); break;
+      case 7: navigate('/admin/payments'); break;
+      case 8: navigate('/admin/settings'); break;
       default: navigate('/admin');
     }
   }
@@ -168,23 +170,25 @@ export default function AdminDashboard({ activeTab }) {
         <div className="modern-dashboard-header">
           <h1 className="modern-dashboard-title">
             {activeMenu === 0 && "Admin Home"}
-            {activeMenu === 1 && "Manage Students"}
-            {activeMenu === 2 && "Manage Instructors"}
-            {activeMenu === 3 && "Manage Courses"}
-            {activeMenu === 4 && "Manage Categories"}
-            {activeMenu === 5 && "Manage Reviews"}
-            {activeMenu === 6 && "Manage Payments"}
-            {activeMenu === 7 && "Settings"}
+            {activeMenu === 1 && "Manage Users"}
+            {activeMenu === 2 && "Manage Students"}
+            {activeMenu === 3 && "Manage Instructors"}
+            {activeMenu === 4 && "Manage Courses"}
+            {activeMenu === 5 && "Manage Categories"}
+            {activeMenu === 6 && "Manage Reviews"}
+            {activeMenu === 7 && "Manage Payments"}
+            {activeMenu === 8 && "Settings"}
           </h1>
           <span className="modern-dashboard-desc">
             {activeMenu === 0 && "Welcome to your modern LMS admin panel. Manage users, instructors, courses, and more with real-time insights."}
-            {activeMenu === 1 && "View and manage all student accounts, track activities, and control access permissions."}
-            {activeMenu === 2 && "Manage instructor profiles, review qualifications, and monitor course creation."}
-            {activeMenu === 3 && "Browse all courses, manage content, and review course materials."}
-            {activeMenu === 4 && "Create and manage course categories to organize the learning platform."}
-            {activeMenu === 5 && "Monitor student reviews and ratings for courses and instructors."}
-            {activeMenu === 6 && "Review payment transactions and manage financial operations."}
-            {activeMenu === 7 && "Configure system settings, appearance, and platform behavior."}
+            {activeMenu === 1 && "View and manage all user accounts, including students and instructors, with full control over access and permissions."}
+            {activeMenu === 2 && "View and manage all student accounts, track activities, and control access permissions."}
+            {activeMenu === 3 && "Manage instructor profiles, review qualifications, and monitor course creation."}
+            {activeMenu === 4 && "Browse all courses, manage content, and review course materials."}
+            {activeMenu === 5 && "Create and manage course categories to organize the learning platform."}
+            {activeMenu === 6 && "Monitor student reviews and ratings for courses and instructors."}
+            {activeMenu === 7 && "Review payment transactions and manage financial operations."}
+            {activeMenu === 8 && "Configure system settings, appearance, and platform behavior."}
           </span>
         </div>
         
@@ -230,6 +234,11 @@ export default function AdminDashboard({ activeTab }) {
         
         {/* Render specific page content based on activeMenu */}
         {activeMenu === 1 && (
+          <React.Suspense fallback={<div className="loading-spinner">Loading users...</div>}>
+            {React.createElement(require('./AdminUsers').default)}
+          </React.Suspense>
+        )}
+        {activeMenu === 2 && (
           <React.Suspense fallback={<div className="loading-spinner">Loading students...</div>}>
             {React.createElement(require('./AdminStudents').default)}
           </React.Suspense>

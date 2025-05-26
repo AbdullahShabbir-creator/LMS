@@ -97,13 +97,14 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/admin" element={<ProtectedRoute element={<AdminDashboard />} role="admin" />} />
-          <Route path="/admin/students" element={<ProtectedRoute element={<AdminDashboard activeTab={1} />} role="admin" />} />
-          <Route path="/admin/instructors" element={<ProtectedRoute element={<AdminDashboard activeTab={2} />} role="admin" />} />
-          <Route path="/admin/courses" element={<ProtectedRoute element={<AdminDashboard activeTab={3} />} role="admin" />} />
-          <Route path="/admin/categories" element={<ProtectedRoute element={<AdminDashboard activeTab={4} />} role="admin" />} />
-          <Route path="/admin/reviews" element={<ProtectedRoute element={<AdminDashboard activeTab={5} />} role="admin" />} />
-          <Route path="/admin/payments" element={<ProtectedRoute element={<AdminDashboard activeTab={6} />} role="admin" />} />
-          <Route path="/admin/settings" element={<ProtectedRoute element={<AdminDashboard activeTab={7} />} role="admin" />} />
+          <Route path="/admin/users" element={<ProtectedRoute element={<AdminDashboard activeTab={1} />} role="admin" />} />
+          <Route path="/admin/students" element={<ProtectedRoute element={<AdminDashboard activeTab={2} />} role="admin" />} />
+          <Route path="/admin/instructors" element={<ProtectedRoute element={<AdminDashboard activeTab={3} />} role="admin" />} />
+          <Route path="/admin/courses" element={<ProtectedRoute element={<AdminDashboard activeTab={4} />} role="admin" />} />
+          <Route path="/admin/categories" element={<ProtectedRoute element={<AdminDashboard activeTab={5} />} role="admin" />} />
+          <Route path="/admin/reviews" element={<ProtectedRoute element={<AdminDashboard activeTab={6} />} role="admin" />} />
+          <Route path="/admin/payments" element={<ProtectedRoute element={<AdminDashboard activeTab={7} />} role="admin" />} />
+          <Route path="/admin/settings" element={<ProtectedRoute element={<AdminDashboard activeTab={8} />} role="admin" />} />
           <Route path="/admin/profile" element={<ProtectedRoute element={<AdminProfile />} role="admin" />} />
           <Route path="/instructor" element={<ProtectedRoute element={<Navigate to="/instructor/dashboard" replace />} role="instructor" />} />
           <Route path="/instructor/dashboard" element={<ProtectedRoute element={<InstructorDashboard />} role="instructor" />} />
