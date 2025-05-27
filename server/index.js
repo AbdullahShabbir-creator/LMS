@@ -71,6 +71,11 @@ const lecturesRoute = require('./routes/lectures');
 const reviewRoutes = require('./routes/reviews');
 const paymentRoutes = require('./routes/payments');
 const adminRoutes = require('./routes/admin');
+const lectureRoutes = require('./routes/lectureRoutes');
+app.use('/api/lectures', lectureRoutes);
+
+// Serve uploaded files
+app.use('/uploads', express.static('uploads'));
 
 // Basic route
 app.get('/', (req, res) => {

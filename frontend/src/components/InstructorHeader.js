@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaBars, FaTimes, FaHome, FaChalkboardTeacher, FaCog, FaSignOutAlt } from 'react-icons/fa';
+import { FaBars, FaTimes, FaHome, FaChalkboardTeacher, FaCog, FaSignOutAlt, FaVideo } from 'react-icons/fa';
 import LMS3DLogo from './LMS3DLogo';
 import '../styles/instructor.modern.css';
 
 const navLinks = [
   { label: 'Home', path: '/instructor/home', icon: <FaHome /> },
   { label: 'Leactures', path: '/instructor/leactures', icon: <FaChalkboardTeacher /> },
+  { label: 'Free Lectures', path: '/instructor/free-lectures', icon: <FaVideo /> },
   { label: 'Dashboard', path: '/instructor/dashboard', icon: <FaChalkboardTeacher /> },
   { label: 'Settings', path: '/instructor/settings', icon: <FaCog /> },
 ];

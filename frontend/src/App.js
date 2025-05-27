@@ -18,6 +18,7 @@ import InstructorReport from './pages/InstructorReport';
 import InstructorNotifications from './pages/InstructorNotifications';
 import InstructorUpload from './pages/InstructorUpload';
 import InstructorStudents from './pages/InstructorStudents';
+import FreeLectures from './pages/FreeLectures';
 import StudentSmartQuiz from './pages/StudentSmartQuiz';
 import StudentMyCourses from './pages/StudentMyCourses';
 import StudentExploreCourses from './pages/StudentExploreCourses';
@@ -117,6 +118,7 @@ function App() {
           <Route path="/instructor/notifications" element={<ProtectedRoute element={<InstructorNotifications />} role="instructor" />} />
           <Route path="/instructor/upload" element={<ProtectedRoute element={<InstructorUpload />} role="instructor" />} />
           <Route path="/instructor/students" element={<ProtectedRoute element={<InstructorStudents />} role="instructor" />} />
+          <Route path="/instructor/free-lectures" element={<ProtectedRoute element={<FreeLectures />} role="instructor" />} />
           <Route path="/instructor/students/:studentId" element={<ProtectedRoute element={<StudentDetail />} role="instructor" />} />
           <Route path="/student" element={<ProtectedRoute element={<StudentDashboard />} role="student" />} />
           <Route path="/student/smart-quiz" element={<ProtectedRoute element={<StudentSmartQuiz />} role="student" />} />

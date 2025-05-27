@@ -1,5 +1,6 @@
 /* Instructor Modern Styles */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Urbanist:wght@400;700&family=DM+Sans:wght@400;700&display=swap');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css');
 
 .instructor-home-root {
   font-family: 'Poppins', 'Urbanist', 'DM Sans', Arial, sans-serif;
@@ -471,6 +472,238 @@
 @media (max-width: 600px) {
   .instructor-home-main {
     gap: 1rem;
+  }
+}
+
+/* Free Lectures Styles */
+.lecture-form-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.lecture-form {
+  margin-bottom: 3rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #fff;
+  font-size: 1rem;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #6c63ff;
+  box-shadow: 0 0 0 2px rgba(108, 99, 255, 0.2);
+}
+
+.file-upload-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.file-upload-label:hover {
+  border-color: #6c63ff;
+  background: rgba(108, 99, 255, 0.1);
+}
+
+.upload-icon {
+  margin-right: 0.5rem;
+  font-size: 1.2rem;
+}
+
+.file-upload {
+  display: none;
+}
+
+.video-preview {
+  margin-top: 1rem;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #000;
+  max-width: 100%;
+}
+
+.video-preview video {
+  width: 100%;
+  display: block;
+}
+
+.submit-btn {
+  background: linear-gradient(135deg, #6c63ff 0%, #4a42cc 100%);
+  color: white;
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(108, 99, 255, 0.3);
+}
+
+.submit-btn:disabled {
+  background: #6c63ff80;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.lectures-list {
+  margin-top: 3rem;
+}
+
+.lectures-list h3 {
+  color: #fff;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.lectures-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.lecture-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+}
+
+.lecture-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.lecture-card-content {
+  padding: 1.5rem;
+}
+
+.lecture-card h4 {
+  color: #fff;
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+}
+
+.lecture-card .course-name {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  margin: 0 0 0.5rem;
+}
+
+.lecture-card .lecture-date {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.8rem;
+  margin: 0;
+}
+
+.delete-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: rgba(255, 99, 99, 0.2);
+  border: none;
+  color: #ff6363;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.delete-btn:hover {
+  background: rgba(255, 99, 99, 0.3);
+  transform: scale(1.1);
+}
+
+.delete-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.loading-container,
+.no-lectures {
+  text-align: center;
+  padding: 2rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1rem;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.error-message {
+  background: rgba(255, 99, 99, 0.2);
+  color: #ff6363;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  border-left: 4px solid #ff6363;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .lecture-form-container {
+    padding: 1.5rem;
+    margin: 1rem;
+  }
+  
+  .lectures-grid {
+    grid-template-columns: 1fr;
   }
 }
 
