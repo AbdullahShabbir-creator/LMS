@@ -38,7 +38,7 @@ function createEnvFile() {
 MONGO_URI=mongodb://127.0.0.1:27017/lms
 
 # Server Configuration
-PORT=5000
+PORT=3001
 NODE_ENV=development
 SKIP_AUTH=true
 

@@ -51,7 +51,7 @@ export default function CourseModal({ course, onClose, onEnroll, onBuy, enrollin
     <div className="course-modal-backdrop" onClick={onClose}>
       <div className="course-modal" onClick={e => e.stopPropagation()}>
         <button className="course-modal-close" onClick={onClose}>&times;</button>
-        <img className="course-modal-img" src={course.image || 'https://source.unsplash.com/featured/?course,education'} alt={course.title} />
+       
         <h2 className="course-modal-title">{course.title}</h2>
         <div className="course-modal-meta">
           <span>Instructor: <b>{course.instructor?.name || 'Unknown'}</b></span>

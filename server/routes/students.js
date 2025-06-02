@@ -4,6 +4,7 @@ const Progress = require('../models/Progress');
 const Notification = require('../models/Notification');
 const Course = require('../models/Course');
 const ensureAuth = require('../middleware/ensureAuth');
+const { auth, requireRole } = require('../middleware/auth');
 
 // Attach authentication middleware to all student routes
 router.use(ensureAuth);
@@ -18,7 +19,7 @@ router.get('/enrolled-courses', async (req, res) => {
     
     // Find courses where the student is in the students array
     const courses = await Course.find({ students: userId }).populate('instructor', 'name email');
-    
+  
     res.json({ courses });
   } catch (err) {
     console.error('Error fetching enrolled courses:', err);
@@ -48,10 +49,11 @@ router.get('/purchased-courses', async (req, res) => {
 });
 
 // Enroll in a course (for free courses)
-router.post('/enroll/:courseId', async (req, res) => {
+router.post('/enroll/:courseId',auth, async (req, res) => {
   try {
     const userId = req.user?.id || req.user?._id;
     const courseId = req.params.courseId;
+    
     
     if (!userId) {
       return res.status(401).json({ error: 'Unauthorized' });
@@ -68,12 +70,12 @@ router.post('/enroll/:courseId', async (req, res) => {
       return res.status(400).json({ error: 'Already enrolled in this course' });
     }
     
-    // Add student to the course
+    // Add student to 9Dthe course
     course.students.push(userId);
     await course.save();
     
     // Create initial progress record
-    await Progress.findOneAndUpdate(
+    /*await Progress.findOneAndUpdate(
       { user: userId, courseId },
       { 
         user: userId,
@@ -84,7 +86,7 @@ router.post('/enroll/:courseId', async (req, res) => {
       },
       { upsert: true, new: true }
     );
-    
+    */
     res.json({ 
       success: true, 
       message: 'Successfully enrolled in course',

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import InstructorHeader from '../components/InstructorHeader';
 import InstructorFooter from '../components/InstructorFooter';
 import { ToastContainer, toast } from 'react-toastify';
@@ -11,26 +11,35 @@ export default function InstructorSettings() {
   const [profile, setProfile] = useState({ name: '', email: '', avatar: '', bio: '' });
   const [password, setPassword] = useState({ old: '', new: '', confirm: '' });
   const [loading, setLoading] = useState(false);
-
+const token=localStorage.getItem('lms_token')
   // Mock fetch profile info on mount
-  React.useEffect(() => {
-    // Replace with real API call
-    setProfile({ name: 'Jane Doe', email: 'jane@yourlms.com', avatar: '', bio: 'Passionate instructor.' });
-  }, []);
+useEffect(() => {
+  async function fetchInstructorProfile() {
+    
+  }
+
+  fetchInstructorProfile();
+}, []);
 
   function handleProfileChange(e) {
     setProfile({ ...profile, [e.target.name]: e.target.value });
   }
 
-  function handleProfileSubmit(e) {
-    e.preventDefault();
-    setLoading(true);
-    // Replace with real API call
-    setTimeout(() => {
-      setLoading(false);
-      toast.success('Profile updated successfully!');
-    }, 900);
+ async function handleProfileSubmit(e) {
+  e.preventDefault();
+  setLoading(true);
+  try {
+    
+
+  
+
+  //  toast.success(data.message || 'Profile updated successfully!');
+  } catch (error) {
+    toast.error(error.message);
+  } finally {
+    setLoading(false);
   }
+}
 
   function handlePasswordChange(e) {
     setPassword({ ...password, [e.target.name]: e.target.value });

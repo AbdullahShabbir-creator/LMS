@@ -23,7 +23,16 @@ const courseSchema = new mongoose.Schema({
   jazzCashNumber: { type: String },
   meezanBankAccount: { type: String },
   paymentRequests: [paymentRequestSchema],
-  curriculum: [lectureSchema],
+ curriculum: [
+  {
+    title: { type: String, required: true },
+    isPreview: { type: Boolean, default: false },
+    videoUrl: { type: String, required: true },
+    videoPublicId: { type: String, required: true },
+    createdAt: { type: Date, default: Date.now }
+  }
+]
+,
   createdAt: { type: Date, default: Date.now }
 });
 

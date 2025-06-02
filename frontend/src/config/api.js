@@ -6,7 +6,7 @@ const API_CONFIG = {
   // In production, this should be your actual API endpoint
   baseUrl: process.env.NODE_ENV === 'development' 
     ? ''
-    : process.env.REACT_APP_API_URL || 'http://localhost:5000',
+    : process.env.REACT_APP_API_URL || 'http://localhost:3001',
 
   // API endpoints
   auth: {
@@ -63,5 +63,5 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
+export const baseUrl = API_CONFIG.baseUrl;
 export { api, API_CONFIG };

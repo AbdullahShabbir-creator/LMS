@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { auth, requireRole } = require('./auth');
+
 const Course = require('../models/Course');
+const ensureAuth = require('../middleware/ensureAuth');
+const { auth, requireRole } = require('../middleware/auth');
 
 // Get all courses (student version, public)
 router.get('/public', async (req, res) => {
@@ -12,7 +14,16 @@ router.get('/public', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
-
+router.get('/instructorcourses',auth,requireRole('instructor'),  async (req, res) => {
+  try {
+   
+    const courses = await Course.find({ instructor: req.user._id }).populate('instructor', 'name email');
+    res.json({ courses });
+  } catch (err) {
+    console.error('Error fetching instructor courses:', err);
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+});
 // Get only free courses
 router.get('/free', async (req, res) => {
   try {
@@ -44,10 +55,12 @@ router.get('/', auth, requireRole('admin'), async (req, res) => {
 });
 
 // (Optional) Get a single course by ID
-router.get('/:id', auth, requireRole('admin'), async (req, res) => {
+router.get('/:id', auth, async (req, res) => {
   try {
+  //  console.log(req.params.id)
     const course = await Course.findById(req.params.id).populate('instructor', 'name email');
     if (!course) return res.status(404).json({ message: 'Course not found' });
+   
     res.json(course);
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
@@ -55,14 +68,16 @@ router.get('/:id', auth, requireRole('admin'), async (req, res) => {
 });
 
 // Create a course (instructor)
-router.post('/', auth, requireRole('instructor'), async (req, res) => {
+router.post('/',auth,requireRole('instructor'), async (req, res) => {
   try {
+  
     const { title, category, description, price, isFree, paymentMethod, jazzCashNumber, meezanBankAccount } = req.body;
-    
+   
     // Validate required fields
     if (!title || !category || !description) {
       return res.status(400).json({ message: 'Missing required fields: title, category, and description are required' });
     }
+   
 
     // Set instructor to the current authenticated user
     const instructor = req.user._id;
@@ -94,7 +109,7 @@ router.post('/', auth, requireRole('instructor'), async (req, res) => {
 
     res.status(201).json(course);
   } catch (err) {
-    console.error('Course creation error:', err);
+    
     if (err.name === 'ValidationError') {
       return res.status(400).json({ message: 'Validation error', errors: err.errors });
     }
@@ -207,5 +222,9 @@ router.patch('/:courseId/approve-payment/:requestId', auth, async (req, res) => 
     res.status(500).json({ message: 'Server error' });
   }
 });
+
+// Get all courses for the logged-in instructor
+
+
 
 module.exports = router;

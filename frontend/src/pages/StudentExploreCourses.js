@@ -11,6 +11,8 @@ import useAuth from '../hooks/useAuth';
 import { getToken } from '../utils/auth';
 import PaymentModal from '../components/PaymentModal';
 import './StudentExploreCourses.css';
+import {baseUrl} from '../config/api';
+
 
 // --- GLOBAL ERROR HANDLER ---
 function handleAuthError(status) {
@@ -40,7 +42,7 @@ export default function StudentExploreCourses() {
     setLoading(true);
     try {
       const { courses: paidCourses, error: paidCoursesError } = await getPaidCourses();
-      
+    
       if (paidCoursesError) {
         console.error('Error fetching paid courses:', paidCoursesError);
         setError('Failed to load courses. Please try again later.');
@@ -56,12 +58,13 @@ export default function StudentExploreCourses() {
         availableCourses = DEMO_COURSES;
       } else {
         // Process the courses to add necessary fields
-        availableCourses = availableCourses.map(course => ({
+        availableCourses = availableCourses?.courses.map(course => ({
           ...course,
           image: course.image || `https://source.unsplash.com/featured/?${course.category || 'education'}`,
           enrolled: false // Initially not enrolled
         }));
       }
+    
       
       setCourses(availableCourses);
       setLoading(false);
@@ -123,14 +126,49 @@ export default function StudentExploreCourses() {
   const categories = ['All', ...Array.from(new Set(courses.map(c => c.category).filter(Boolean)))];
 
   // Handle purchase action
-  const handleBuy = (course) => {
-    setSelectedCourse(course);
-    setShowPayment(true);
-  };
+const handleBuy = async (course) => {
+  try {
+    const token = getToken();// Get auth token
+
+    const response = await fetch(`${baseUrl}/api/student/enroll/${course._id}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`, // Include token for auth
+      },
+      
+      body: JSON.stringify({ courseId: course._id || course.id }), // Send courseId
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      handleAuthError(response.status);
+      console.log(response)
+      throw new Error(data.message || 'Enrollment failed');
+    }
+
+    toast.success('Enrolled in course successfully');
+
+    // Update UI
+    setCourses(prev =>
+      prev.map(c =>
+        (c._id || c.id) === (course._id || course.id)
+          ? { ...c, enrolled: true }
+          : c
+      )
+    );
+  } catch (err) {
+    toast.error(err.message || 'An error occurred while enrolling');
+    console.error(err);
+  }
+};
+
 
   // Handle payment success
   const handlePaymentSuccess = async (paymentDetails) => {
     if (!selectedCourse) return;
+    console.log('payment shown')
     
     setEnrolling(true);
     try {
@@ -175,6 +213,12 @@ export default function StudentExploreCourses() {
       <AnimatedBallsBackground />
       <HideOnScrollHeader showMain />
       <main className="explore-main-content">
+         <CourseModal
+        course={selectedCourse}
+        onClose={() => setSelectedCourse(null)}
+        onBuy={handleBuy}
+        enrolling={enrolling}
+      />
         <motion.h1
           className="explore-title explore-title-3d"
           initial={{ scale: 0.9, rotateY: 40, opacity: 0 }}
@@ -213,33 +257,33 @@ export default function StudentExploreCourses() {
                 <div className="explore-empty">No courses found.</div>
               ) : (
                 pagedCourses.map(course => (
-                  <div key={course._id || course.id} className="explore-course-card" onClick={() => setSelectedCourse(course)}>
-                    <img src={course.image || 'https://source.unsplash.com/featured/?course,education'} alt={course.title} className="explore-course-img" />
-                    <div className="explore-course-info">
-                      <h2 className="explore-course-title">{course.title}</h2>
-                      <p className="explore-course-desc">{course.description}</p>
-                      <div className="explore-course-meta">
-                        <span className="explore-course-instructor">{course.instructor?.name || 'Unknown'}</span>
-                        <span className="explore-course-category">{course.category}</span>
-                      </div>
-                      {course.rating && (
-                        <div className="explore-course-rating">{course.rating} / 5</div>
-                      )}
-                      <div className="explore-course-price">
-                        {course.price ? `₹${course.price}` : 'Free'}
-                      </div>
-                      <button
-                        className="explore-enroll-btn"
-                        disabled={course.enrolled}
-                        onClick={e => { 
-                          e.stopPropagation(); 
-                          handleBuy(course);
-                        }}
-                      >
-                        {course.enrolled ? 'Enrolled' : 'Buy Now'}
-                      </button>
-                    </div>
-                  </div>
+               <div key={course._id || course.id} className="explore-course-card" onClick={() => setSelectedCourse(course)}>
+  <div className="explore-course-info no-image">
+    <h2 className="explore-course-title">{course.title}</h2>
+    <p className="explore-course-desc">{course.description}</p>
+    <div className="explore-course-meta">
+      <span className="explore-course-instructor">{course.instructor?.name || 'Unknown'}</span>
+      <span className="explore-course-category">{course.category}</span>
+    </div>
+    {course.rating && (
+      <div className="explore-course-rating">{course.rating} / 5</div>
+    )}
+    <div className="explore-course-price">
+      {course.price ? `₹${course.price}` : 'Free'}
+    </div>
+    <button
+      className="explore-enroll-btn"
+      disabled={course.enrolled}
+      onClick={e => { 
+        e.stopPropagation(); 
+        handleBuy(course);
+      }}
+    >
+      {course.enrolled ? 'Enrolled' : 'Buy Now'}
+    </button>
+  </div>
+</div>
+
                 ))
               )}
             </div>
@@ -253,24 +297,21 @@ export default function StudentExploreCourses() {
           </>
         )}
       </main>
-      <CourseModal
-        course={selectedCourse}
-        onClose={() => setSelectedCourse(null)}
-        onBuy={handleBuy}
-        enrolling={enrolling}
-      />
-      {showPayment && selectedCourse && (
-        <PaymentModal
-          course={selectedCourse}
-          onClose={() => setShowPayment(false)}
-          onSuccess={handlePaymentSuccess}
-          loading={enrolling}
-        />
-      )}
+     
+     {showPayment && selectedCourse && (
+  <PaymentModal
+    course={selectedCourse}
+    onClose={() => setShowPayment(false)}
+    onSuccess={handlePaymentSuccess}
+    loading={enrolling}
+  />
+)}
+
       <ToastContainer position="bottom-right" />
-      <footer className="explore-footer-container">
+     {/*} <footer className="explore-footer-container">
         <StudentFooter />
       </footer>
+      */}
     </div>
   );
 }

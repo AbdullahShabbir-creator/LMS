@@ -24,9 +24,9 @@ export default function Register() {
     e.preventDefault();
     setLoading(true);
     setError('');
-    setSuccess('');
+    setSuccess('');    
     try {
-      await axios.post('http://localhost:5000/api/auth/register', form);
+      await axios.post('http://localhost:3001/api/auth/register', form);
       setSuccess('Registration successful! You can now log in.');
       setForm({ name: '', email: '', password: '', role: 'student' });
     } catch (err) {

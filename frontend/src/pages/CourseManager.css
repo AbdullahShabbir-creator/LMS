@@ -1,0 +1,101 @@
+/* Container for all course cards */
+.courses-list {
+  display: flex;
+  flex-wrap: wrap;           /* Allow cards to wrap to next line */
+  gap: 20px;                 /* Space between cards */
+  padding: 0;
+  margin: 0;
+  justify-content: flex-start; /* Align cards to the left */
+}
+
+/* Each individual course card */
+.course-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px 24px;
+  box-shadow: 0 2px 16px rgba(35, 37, 38, 0.06);
+  transition: box-shadow 0.3s ease;
+  
+  flex: 1 1 280px;       /* Flexible width with a base of 280px */
+  max-width: 320px;      /* Max width of each card */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Hover effect for cards */
+.course-card:hover {
+  box-shadow: 0 6px 28px rgba(35, 37, 38, 0.12);
+}
+
+/* Header inside each card */
+.course-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.course-card-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #232526;
+  font-weight: 700;
+}
+
+/* Action buttons (edit/delete) */
+.course-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.icon-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  color: #185a9d;
+  transition: color 0.2s ease;
+}
+
+.icon-btn:hover {
+  color: #00bfff;
+}
+
+/* Course description */
+.course-desc {
+  color: #555;
+  font-size: 1rem;
+  margin-bottom: 12px;
+  flex-grow: 1;
+}
+
+/* Course meta info container */
+.course-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #00bfff;
+}
+
+/* Category style */
+.course-category {
+  background: #e1f5fe;
+  color: #0288d1;
+  padding: 4px 12px;
+  border-radius: 16px;
+}
+
+/* Price style */
+.course-price {
+  color: #0288d1;
+}
+
+/* Responsive: stack cards on smaller screens */
+@media (max-width: 600px) {
+  .course-card {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+}

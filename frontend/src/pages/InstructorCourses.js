@@ -49,7 +49,7 @@ export default function InstructorCourses() {
           <ul style={{ listStyle: 'none', padding: 0 }}>
             {courses.map(course => (
               <li key={course._id || course.id} style={{ background: '#fff', marginBottom: 16, borderRadius: 12, padding: 18, boxShadow: '0 2px 16px #2325260a' }}>
-                <h3 style={{ margin: 0, color: '#185a9d' }}>{course.title}</h3>
+                <h3 style={{ margin: 0, color: 'black' }}>{course.title}</h3>
                 <div style={{ color: '#555', marginTop: 6 }}>{course.description}</div>
                 <div style={{ marginTop: 10, color: '#00bfff', fontWeight: 600 }}>
                   {course.isFree ? 'Free' : `Rs. ${course.price} (${course.paymentMethod === 'JazzCash' ? 'JazzCash' : 'Meezan Bank'})`}

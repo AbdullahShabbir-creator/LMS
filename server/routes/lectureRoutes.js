@@ -3,8 +3,9 @@ const router = express.Router();
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const auth = require('../middleware/auth'); // Your auth middleware
-
+const { auth, requireRole } = require('../middleware/auth');
+const Lecture=require('../models/Lecture');
+const ensureAuth = require('../middleware/ensureAuth');
 // Configure multer for file uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -33,7 +34,7 @@ const upload = multer({
 });
 
 // Create a new lecture
-router.post('/', auth, upload.single('video'), async (req, res) => {
+router.post('/', upload.single('video'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ message: 'Please upload a video file' });
@@ -59,7 +60,7 @@ router.post('/', auth, upload.single('video'), async (req, res) => {
 });
 
 // Get all lectures
-router.get('/', auth, async (req, res) => {
+router.get('/',ensureAuth, async (req, res) => {
   try {
     // Example using mongoose
     // const lectures = await Lecture.find({ instructor: req.user.id }).sort('-createdAt');
@@ -74,7 +75,7 @@ router.get('/', auth, async (req, res) => {
 });
 
 // Delete a lecture
-router.delete('/:id', auth, async (req, res) => {
+router.delete('/:id', ensureAuth, async (req, res) => {
   try {
    
     const lecture = await Lecture.findById(req.params.id);

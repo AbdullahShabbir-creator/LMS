@@ -3,8 +3,9 @@ const router = express.Router();
 const multer = require('multer');
 const cloudinary = require('../utils/cloudinary');
 const firebaseBridge = require('../utils/firebase-bridge');
-const { auth, requireRole } = require('./auth');
-
+const { auth, requireRole } = require('../middleware/auth');
+const Lecture=require('../models/Lecture')
+const Course=require('../models/Course')
 // Set up multer for handling multipart/form-data
 const storage = multer.memoryStorage();
 const upload = multer({ 
@@ -15,51 +16,50 @@ const upload = multer({
 });
 
 // POST /api/upload - Upload a video to Cloudinary (with Firebase compatibility)
-router.post('/', auth, requireRole('instructor'), upload.single('video'), async (req, res) => {
+// POST /api/upload - Upload a video to Cloudinary (with Firebase compatibility)
+router.post('/', upload.single('video'), async (req, res) => {
   try {
-    if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
+    const { courseId, lectureTitle } = req.body;
 
-    // Check file type
-    if (!req.file.mimetype.startsWith('video/')) {
-      return res.status(400).json({ message: 'Please upload a valid video file' });
+    if (!courseId || !lectureTitle) {
+      return res.status(400).json({ message: 'courseId and lectureTitle are required' });
     }
 
-    // Log for debugging
-    console.log(`Upload request received for ${req.file.originalname} (${req.file.size} bytes)`);
+    if (!req.file) {
+      return res.status(400).json({ message: 'No video file uploaded' });
+    }
+
+    // Convert buffer to base64 for Cloudinary
+    const fileBuffer = req.file.buffer;
+    const mimeType = req.file.mimetype;
+    const base64 = fileBuffer.toString('base64');
+    const dataURI = `data:${mimeType};base64,${base64}`;
+
+    // Upload video to Cloudinary
+    const result = await cloudinary.uploader.upload_large(dataURI, {
+      resource_type: 'video',
+      folder: 'course_videos',
+    });
+
+
+
+
     
-    try {
-      // Use our Firebase bridge for better compatibility
-      const uploadResult = await firebaseBridge.uploadVideo(
-        req.file.buffer,
-        req.file.mimetype, 
-        {
-          folder: 'course_videos',
-          resource_type: 'video',
-          // Include filename for better organization
-          public_id: `course_videos/${Date.now()}_${req.file.originalname.replace(/\.[^/.]+$/, "")}`
-        }
-      );
-      
-      // Return Firebase-compatible response
-      return res.json({ 
-        url: uploadResult.url, 
-        public_id: uploadResult.public_id,
-        duration: uploadResult.duration || 0,
-        // Include Firebase-compatible fields
-        downloadURL: uploadResult.downloadURL,
-        metadata: uploadResult.metadata
-      });
-    } catch (uploadError) {
-      console.error('Upload error:', uploadError);
-      return res.status(500).json({ 
-        message: 'Failed to upload video to cloud storage', 
-        error: uploadError.message 
-      });
-    }
-  } catch (err) {
-    console.error('Server error:', err);
-    res.status(500).json({ message: 'Server error', error: err.message });
+
+    res.json({
+      message: 'Video uploaded and lecture added successfully',
+     
+      url:result.secure_url,
+      public_id:result.public_id,
+     
+    });
+  } catch (error) {
+    console.error('Upload and save failed:', error);
+    res.status(500).json({ message: 'Upload failed', error: error.message });
   }
 });
+
+
+
 
 module.exports = router;

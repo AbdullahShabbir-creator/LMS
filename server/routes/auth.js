@@ -98,9 +98,10 @@ function auth(req, res, next) {
   console.log('Auth check middleware triggered');
   const authHeader = req.headers.authorization;
   console.log('Authorization header:', authHeader ? authHeader.split(' ')[1] : 'None');
+  console.log(req.headers.authorization)
 
   // If we're in development mode, skip auth verification
-  if (process.env.NODE_ENV === 'development') {
+  /*if (process.env.NODE_ENV === 'development') {
     console.log('Development mode: Skipping auth verification');
     // Create a proper MongoDB ObjectId for the demo user
     const demoUserId = new mongoose.Types.ObjectId();
@@ -110,9 +111,9 @@ function auth(req, res, next) {
       email: 'dev@example.com',
       role: 'admin',  // Changed to admin for development
       name: 'Development Admin'
-    };
-    return next();
-  }
+      }
+      return next();
+    };*/
 
   if (!authHeader) {
     return res.status(401).json({ message: 'No token provided' });
@@ -145,12 +146,17 @@ function auth(req, res, next) {
 // Middleware: Role check
 function requireRole(role) {
   return (req, res, next) => {
+    console.log('Role check middlewaddddre triggered');
+  
+    console.log('Required role:', role);
     if (!req.user || !req.user.role) {
       return res.status(401).json({ message: 'Not authenticated' });
     }
     if (req.user.role !== role) {
+      console.log('Role mismatch:', req.user.role, '!==', role);
       return res.status(403).json({ message: 'Forbidden' });
     }
+    
     next();
   };
 }
@@ -159,6 +165,7 @@ function requireRole(role) {
 router.post('/register', async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
+   
     if (role === 'admin') return res.status(400).json({ message: 'Cannot register as admin' });
     const exists = await User.findOne({ email });
     if (exists) return res.status(400).json({ message: 'Email already in use' });
@@ -243,7 +250,7 @@ router.post('/login', async (req, res) => {
       }
       
       // Always require MFA for student and instructor roles - unless already verified
-      if ((user.role === 'student' || user.role === 'instructor') && !mfaVerified) {
+    /*  if ((user.role === 'student' || user.role === 'instructor') && !mfaVerified) {
         console.log('MFA required for', user.role);
         
         // Generate OTP code if necessary
@@ -258,7 +265,7 @@ router.post('/login', async (req, res) => {
           message: 'MFA verification required',
           user: { _id: user._id, name: user.name, email: user.email, role: user.role }
         });
-      }
+      }*/
       
       // Generate JWT token with backward compatible format
       const token = jwt.sign(

@@ -2,13 +2,16 @@ import React, { useState, useEffect, useCallback } from 'react';
 import InstructorHeader from '../components/InstructorHeader';
 import InstructorFooter from '../components/InstructorFooter';
 import CurriculumBuilder from '../components/CurriculumBuilder';
-import BulkVideoUpload from '../components/BulkVideoUpload';
+import BulkVideoUpload from '../components/BulkVideoUpload'
+
 import ReactPlayer from 'react-player';
 import { FaPlus, FaTrash, FaEdit, FaVideo, FaEye } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import '../styles/course.manager.css';
 
-const API_BASE_URL = 'http://localhost:3000';
+import {baseUrl} from '../config/api';
+const API_BASE_URL = 'http://localhost:3001';
+const token = localStorage.getItem('lms_token');
 
 const initialCourses = [
   {
@@ -32,48 +35,27 @@ const initialCourses = [
 ];
 
 // Utility to upload a video to the backend and get its Firebase URL
-async function uploadVideoToFirebase(file) {
-  try {
-    console.log("Starting upload for file:", file.name);
-    
-    // Create a form with the file
-    const formData = new FormData();
-    formData.append('video', file);
-    
-    // Show detailed error if server is down
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
-    
-    const res = await fetch(`${API_BASE_URL}/api/upload`, {
-      method: 'POST',
-      body: formData,
-      credentials: 'include',
-      signal: controller.signal
-    });
-    
-    clearTimeout(timeoutId);
-    
-    if (!res.ok) {
-      const errorText = await res.text().catch(() => "Unknown server error");
-      console.error("Server error response:", errorText);
-      throw new Error(`Upload failed: ${res.status} ${res.statusText}`);
-    }
-    
-    const data = await res.json();
-    if (!data || !data.url) {
-      throw new Error('Invalid response from server, missing URL');
-    }
-    
-    console.log("Upload success for file:", file.name);
-    return data;
-  } catch (error) {
-    console.error('Upload error:', error);
-    if (error.name === 'AbortError') {
-      throw new Error('Upload timed out. The server might be down or overloaded. Please try again later.');
-    }
-    throw new Error(`Failed to upload ${file.name}: ${error.message}`);
+async function uploadVideoToBackend(file, courseId, lectureTitle) {
+  const formData = new FormData();
+  formData.append('video', file);
+  formData.append('courseId', courseId);
+  formData.append('lectureTitle', lectureTitle);
+
+  const response = await fetch(`${baseUrl}/api/upload/`, {
+    method: 'POST',
+    body: formData,
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || 'Video upload failed');
   }
+
+  return response.json();
 }
+
+
 
 export default function CourseManager() {
   const [courses, setCourses] = useState([]);
@@ -97,11 +79,12 @@ export default function CourseManager() {
   // Function to fetch courses from backend
   const fetchCourses = useCallback(async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/api/courses/instructor`, {
+      
+      const response = await fetch(`${baseUrl}/api/courses/instructorcourses`, {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          'Authorization': `Bearer ${token}`,
+        },
+        credentials: 'include'
       });
 
       if (!response.ok) {
@@ -110,9 +93,9 @@ export default function CourseManager() {
 
       const data = await response.json();
       setCourses(data.courses || []);
-      console.log('Courses fetched successfully:', data.courses);
+     
     } catch (error) {
-      console.error('Error fetching courses:', error);
+  
       console.error('Failed to load courses. Please check your network connection and try again.');
     }
   }, []);
@@ -130,15 +113,7 @@ export default function CourseManager() {
   }, [fetchCourses]);
 
   async function handleDeleteCourse(id) {
-    const res = await fetch(`${API_BASE_URL}/api/courses/${id}`, {
-      method: 'DELETE',
-      credentials: 'include',
-    });
-    if (res.ok) {
-      setCourses(courses.filter(c => c._id !== id && c.id !== id));
-    } else {
-      alert('Failed to delete course');
-    }
+    
   }
 
   // Edit course (basic: load into form)
@@ -160,152 +135,127 @@ export default function CourseManager() {
     setEditingCourseId(course._id || course.id);
   }
 
-  async function handleSaveCourse(e) {
-    e.preventDefault();
-    setUploading(true);
-    try {
-      // Validate required fields first
-      if (!form.title.trim()) {
-        throw new Error('Course title is required');
-      }
-      if (!form.description.trim()) {
-        throw new Error('Course description is required');
-      }
-      if (!form.isFree && !form.price) {
-        throw new Error('Please set a price for your paid course');
-      }
-      if (!form.isFree && !form.paymentMethod) {
-        throw new Error('Please select a payment method for your paid course');
-      }
-      if (form.paymentMethod === 'JazzCash' && !form.jazzCashNumber) {
-        throw new Error('Please enter your JazzCash number');
-      }
-      if (form.paymentMethod === 'MeezanBank' && !form.meezanBankAccount) {
-        throw new Error('Please enter your Meezan Bank account');
-      }
-      
-      // Check if we have enough videos for all lectures
-      if (curriculum.length > 0 && videos.length === 0) {
-        throw new Error('Please upload at least one video for your course');
-      }
+async function handleSaveCourse(e) {
+  e.preventDefault();
+  setUploading(true);
 
-      let uploadedVideos = [];
-      // Only process videos if we have any
-      if (videos.length > 0) {
-        // Upload each video one by one
-        for (let i = 0; i < videos.length; i++) {
-          const video = videos[i];
-          if (!video.url.startsWith('http')) {
-            try {
-              const uploaded = await uploadVideoToFirebase(video.file);
-              uploadedVideos.push({ 
-                ...video, 
-                url: uploaded.url, 
-                public_id: uploaded.public_id,
-                duration: uploaded.duration || 0
-              });
-            } catch (error) {
-              console.error(`Failed to upload video ${video.title}:`, error);
-              throw new Error(`Failed to upload video: ${video.title}. Please try again.`);
-            }
-          } else {
-            uploadedVideos.push(video);
-          }
-        }
-      }
+  try {
+    // Step 1: Validate form fields
+    if (!form.title.trim()) throw new Error('Course title is required');
+    if (!form.description.trim()) throw new Error('Course description is required');
+    if (!form.isFree && !form.price) throw new Error('Please set a price for your paid course');
+    if (!form.isFree && !form.paymentMethod) throw new Error('Please select a payment method');
+    if (form.paymentMethod === 'JazzCash' && !form.jazzCashNumber) throw new Error('Enter JazzCash number');
+    if (form.paymentMethod === 'MeezanBank' && !form.meezanBankAccount) throw new Error('Enter Meezan Bank account');
+    if (curriculum.length > 0 && videos.length === 0) throw new Error('Please upload at least one video');
 
-      // Map videos to lectures if possible
-      const lecturesWithVideo = curriculum.map((lec, idx) => {
-        // If we have a video for this lecture, use it
-        if (idx < uploadedVideos.length) {
-          return {
-            ...lec,
-            videoUrl: uploadedVideos[idx].url,
-            videoPublicId: uploadedVideos[idx].public_id || '',
-            videoName: uploadedVideos[idx].title || ''
-          };
-        } 
-        // Use existing video data if available
-        return {
-          ...lec,
-          videoUrl: lec.videoUrl || '',
-          videoPublicId: lec.videoPublicId || '',
-          videoName: lec.videoName || ''
-        };
+    // Step 2: Save course first (without videos)
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user || !user._id) throw new Error('User not authenticated');
+
+    const baseCourseData = {
+      title: form.title.trim(),
+      description: form.description.trim(),
+      instructor: user._id,
+      category: form.category,
+     /* curriculum: curriculum.map(lec => ({
+        title: lec.title,
+        isPreview: lec.isPreview || false,
+        videoUrl: '', // Empty for now
+        videoPublicId: '',
+        createdAt: new Date()
+      })),*/
+      price: form.isFree ? 0 : parseFloat(form.price),
+      isFree: form.isFree,
+      paymentMethod: form.isFree ? 'None' : form.paymentMethod,
+      jazzCashNumber: form.paymentMethod === 'JazzCash' ? form.jazzCashNumber : '',
+      meezanBankAccount: form.paymentMethod === 'MeezanBank' ? form.meezanBankAccount : ''
+    };
+
+    let courseResponse;
+    let courseId;
+
+    if (editingCourseId) {
+      courseResponse = await fetch(`${baseUrl}/api/courses/${editingCourseId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        credentials: 'include',
+        body: JSON.stringify(baseCourseData)
       });
-
-      // Get user ID from localStorage
-      const user = JSON.parse(localStorage.getItem('user'));
-      if (!user || !user._id) {
-        throw new Error('User not authenticated');
-      }
-
-      const courseData = {
-        title: form.title.trim(),
-        description: form.description.trim(),
-        instructor: user._id,
-        category: form.category,
-        curriculum: lecturesWithVideo.map(lec => ({
-          title: lec.title,
-          isPreview: lec.isPreview || false,
-          videoUrl: lec.videoUrl || '',
-          videoPublicId: lec.videoPublicId || '',
-          createdAt: new Date()
-        })),
-        price: form.isFree ? 0 : parseFloat(form.price),
-        isFree: form.isFree,
-        paymentMethod: form.isFree ? 'None' : form.paymentMethod,
-        jazzCashNumber: form.paymentMethod === 'JazzCash' ? form.jazzCashNumber : '',
-        meezanBankAccount: form.paymentMethod === 'MeezanBank' ? form.meezanBankAccount : ''
-      };
-      
-      let res;
-      if (editingCourseId) {
-        res = await fetch(`${API_BASE_URL}/api/courses/${editingCourseId}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify(courseData)
-        });
-      } else {
-        res = await fetch(`${API_BASE_URL}/api/courses`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify(courseData)
-        });
-      }
-      
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Failed to save course');
-      }
-      
-      const saved = await res.json();
-      // Update local state and trigger a refresh
-      if (editingCourseId) {
-        setCourses(prev => prev.map(c => (c._id === editingCourseId || c.id === editingCourseId) ? saved : c));
-      } else {
-        setCourses(prev => [...prev, saved]);
-      }
-      
-      // Refresh the course list to ensure we have the latest data
-      await fetchCourses();
-      // Force a re-render to update the UI
-      setCourses(prev => [...prev]);
-      
-      // Reset form
-      setShowForm(false);
-      setCurriculum([]);
-      setVideos([]);
-      setEditingCourseId(null);
-    } catch (error) {
-      console.error('Error saving course:', error);
-      alert(`Failed to save course: ${error.message}`);
-    } finally {
-      setUploading(false);
+    } else {
+      courseResponse = await fetch(`${baseUrl}/api/courses`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        credentials: 'include',
+        body: JSON.stringify(baseCourseData)
+      });
     }
+
+    if (!courseResponse.ok) throw new Error('Failed to save course');
+    const savedCourse = await courseResponse.json();
+    courseId = savedCourse._id;
+
+    // Step 3: Upload videos now using course ID
+    const uploadedVideos = [];
+
+    for (let i = 0; i < videos.length; i++) {
+      const video = videos[i];
+      if (!video.url.startsWith('http')) {
+        const uploaded = await uploadVideoToBackend(
+          video.file,
+          courseId, // Pass courseId instead of title
+          curriculum[i]?.title || video.title || 'Untitled Lecture'
+        );
+        uploadedVideos.push({
+          ...video,
+          url: uploaded.url,
+          public_id: uploaded.public_id,
+          duration: uploaded.duration || 0
+        });
+      } else {
+        uploadedVideos.push(video);
+      }
+    }
+
+    // Step 4: Update course with video info
+    const updatedCurriculum = curriculum.map((lec, idx) => ({
+      ...lec,
+      videoUrl: uploadedVideos[idx]?.url || '',
+      videoPublicId: uploadedVideos[idx]?.public_id || '',
+      videoName: uploadedVideos[idx]?.title || ''
+    }));
+
+    const updateResponse = await fetch(`${baseUrl}/api/courses/${courseId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      credentials: 'include',
+      body: JSON.stringify({ curriculum: updatedCurriculum })
+    });
+
+    if (!updateResponse.ok) throw new Error('Failed to update course with videos');
+
+    const updatedCourse = await updateResponse.json();
+    setCourses(prev => editingCourseId
+      ? prev.map(c => (c._id === courseId || c.id === courseId) ? updatedCourse : c)
+      : [...prev, updatedCourse]);
+
+      toast.success('Course uploaded successfully');
+      // Reset form
+    await fetchCourses();
+    setCourses(prev => [...prev]);
+
+    setShowForm(false);
+    setCurriculum([]);
+    setVideos([]);
+    setEditingCourseId(null);
+
+  } catch (error) {
+    console.error('Error saving course:', error);
+    alert(`Failed to save course: ${error.message}`);
+  } finally {
+    setUploading(false);
   }
+}
 
   // Handlers for CRUD (real backend)
   async function handleAddCourse() {
@@ -430,7 +380,9 @@ export default function CourseManager() {
         
         <div className="courses-list">
           {courses.map(course => (
-            <div className="course-card" key={course._id || course.id}>
+            <div className="course-card" key={course._id || course.id} style={{
+              display:'flex'
+            }}>
               <div className="course-card-header">
                 <h3>{course.title}</h3>
                 <div className="course-actions">
@@ -445,20 +397,7 @@ export default function CourseManager() {
                   {course.isFree ? 'Free' : `PKR ${course.price}`}
                 </span>
               </div>
-              <div className="curriculum-list">
-                {course.curriculum && course.curriculum.map(lec => (
-                  <div className={`curriculum-item${lec.isPreview ? ' preview' : ''}`} key={lec._id || lec.id}>
-                    <FaVideo className="curriculum-icon" />
-                    <span>{lec.title}</span>
-                    {lec.isPreview && <FaEye className="preview-icon" title="Free Preview" />}
-                    {lec.videoUrl && (
-                      <div style={{marginTop: 6, width: '100%'}}>
-                        <ReactPlayer url={lec.videoUrl} controls width="100%" height="140px" style={{borderRadius: 8}}/>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
+           
             </div>
           ))}
         </div>

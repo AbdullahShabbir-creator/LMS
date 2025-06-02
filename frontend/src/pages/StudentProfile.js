@@ -136,15 +136,7 @@ export default function StudentProfile() {
   };
   const handleDelete = async () => {
     setShowDeleteConfirm(false);
-    const token = getAuthToken();
-    try {
-      await axios.delete('/api/student/account', { headers: { Authorization: `Bearer ${token}` } });
-      localStorage.removeItem('lms_token');
-      alert('Your account has been deleted. You will be redirected.');
-      window.location.href = '/login';
-    } catch (err) {
-      alert('Failed to delete account. Please try again.');
-    }
+    
   };
   const handleDownload = () => {
     // Generate a PDF academic report

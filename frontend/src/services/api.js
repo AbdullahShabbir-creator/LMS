@@ -1,14 +1,13 @@
 // API Service for handling course interactions
 import { toast } from 'react-toastify';
 import { getToken as getAuthToken } from '../utils/auth';
-
-const API_URL = 'http://localhost:5000';  // Set the correct API base URL
-
+import {baseUrl} from '../config/api';
 // Fetch all available courses
+const token = getAuthToken();
 export const getAllCourses = async () => {
   try {
-    const token = getAuthToken();
-    const response = await fetch(`${API_URL}/api/courses/public`, {
+ 
+    const response = await fetch(`${baseUrl}/api/courses/public`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
     
@@ -26,48 +25,46 @@ export const getAllCourses = async () => {
   }
 };
 
-// Get enrolled courses for current student
 export const getEnrolledCourses = async () => {
   try {
-    const token = getAuthToken();
-    if (!token) return { error: 'Not authenticated' };
-    
-    const response = await fetch(`${API_URL}/api/students/enrolled-courses`, {
+   
+    const res = await fetch(`${baseUrl}/api/student/enrolled-courses`, {
       headers: { Authorization: `Bearer ${token}` },
+      credentials:'include'
     });
-    
-    if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
-        return { error: 'Authentication failed' };
-      }
-      throw new Error('Failed to fetch enrolled courses');
-    }
-    
-    const data = await response.json();
-    return { courses: data.courses || [] };
-  } catch (error) {
-    return { error: error.message || 'Failed to fetch enrolled courses' };
+    console.log(res)
+    const data=res.json()
+    return data;
+  } catch (err) {
+    console.error('Failed to fetch enrolled courses', err);
+    return { error: 'Failed to fetch enrolled courses' };
   }
 };
 
 // Get course details by ID
 export const getCourseDetails = async (courseId) => {
   try {
-    const token = getAuthToken();
-    const response = await fetch(`${API_URL}/api/courses/${courseId}`, {
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    
+  
+    const response = await fetch(`${baseUrl}/api/courses/${courseId}`, {
+      headers: token ? { Authorization: `Bearer ${token}` }
+       : {},
+      
     });
     
     if (!response.ok) {
       if (response.status === 401 || response.status === 403) {
         return { error: 'Authentication failed' };
       }
+      
       throw new Error('Failed to fetch course details');
     }
     
     const data = await response.json();
+    console.log(response)
     return { course: data };
   } catch (error) {
+    console.log(error)
     return { error: error.message || 'Failed to fetch course details' };
   }
 };
@@ -75,10 +72,10 @@ export const getCourseDetails = async (courseId) => {
 // Enroll in a course (free courses)
 export const enrollInCourse = async (courseId) => {
   try {
-    const token = getAuthToken();
+   
     if (!token) return { error: 'Not authenticated' };
     
-    const response = await fetch(`${API_URL}/api/students/enroll/${courseId}`, {
+    const response = await fetch(`${baseUrl}/api/students/enroll/${courseId}`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -100,10 +97,10 @@ export const enrollInCourse = async (courseId) => {
 // Purchase a course
 export const purchaseCourse = async (courseId, paymentDetails) => {
   try {
-    const token = getAuthToken();
+   
     if (!token) return { error: 'Not authenticated' };
     
-    const response = await fetch(`${API_URL}/api/courses/purchase/${courseId}`, {
+    const response = await fetch(`${baseUrl}/api/courses/purchase/${courseId}`, {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
@@ -130,12 +127,14 @@ export const purchaseCourse = async (courseId, paymentDetails) => {
 // Get course content (for enrolled students)
 export const getCourseContent = async (courseId) => {
   try {
-    const token = getAuthToken();
+    //const token = getAuthToken();
+   
     if (!token) return { error: 'Not authenticated' };
     
-    const response = await fetch(`${API_URL}/api/courses/${courseId}/content`, {
+    const response = await fetch(`${baseUrl}/api/courses/${courseId}/content`, {
       headers: { Authorization: `Bearer ${token}` },
     });
+    console.log(response)
     
     if (!response.ok) {
       if (response.status === 401 || response.status === 403) {
@@ -157,10 +156,10 @@ export const getCourseContent = async (courseId) => {
 // Get purchased courses for current student
 export const getPurchasedCourses = async () => {
   try {
-    const token = getAuthToken();
+   
     if (!token) return { error: 'Not authenticated' };
     
-    const response = await fetch(`${API_URL}/api/students/purchased-courses`, {
+    const response = await fetch(`${baseUrl}/api/students/purchased-courses`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     
@@ -181,9 +180,9 @@ export const getPurchasedCourses = async () => {
 // Get free courses
 export const getFreeCourses = async () => {
   try {
-    const token = getAuthToken();
+  
     
-    const response = await fetch(`${API_URL}/api/courses/free`, {
+    const response = await fetch(`${baseUrl}/api/courses/free`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
     
@@ -204,22 +203,16 @@ export const getFreeCourses = async () => {
 // Get paid courses (for explore page)
 export const getPaidCourses = async () => {
   try {
-    const token = getAuthToken();
-    
-    const response = await fetch(`${API_URL}/api/courses/paid`, {
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-    });
-    
-    if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
-        return { error: 'Authentication failed' };
-      }
-      throw new Error('Failed to fetch paid courses');
-    }
-    
+    const response = await fetch(`${baseUrl}/api/courses/public`);
     const data = await response.json();
-    return { courses: data.courses || [] };
+
+    if (!response.ok) {
+      return { courses: [], error: data.message || 'Failed to fetch courses' };
+    }
+
+    return { courses: data, error: null };
   } catch (error) {
-    return { error: error.message || 'Failed to fetch paid courses' };
+    console.error('API error fetching public courses:', error);
+    return { courses: [], error: 'Network error. Please try again.' };
   }
-}; 
+};

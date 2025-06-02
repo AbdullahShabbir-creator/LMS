@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
-const { auth, requireRole } = require('./auth');
+const { auth, requireRole } = require('../middleware/auth');
 const Course = require('../models/Course');
 const Earning = require('../models/Earning');
 
@@ -14,7 +14,15 @@ router.get('/', auth, requireRole('admin'), async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
-
+router.get('/me', auth, requireRole('instructor'), async (req, res) => {
+  try {
+    const instructor = await User.findById(req.user._id).select('-password');
+    if (!instructor) return res.status(404).json({ message: 'Instructor not found' });
+    res.json(instructor);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 // (Optional) Get a single instructor by ID
 router.get('/:id', auth, requireRole('admin'), async (req, res) => {
   try {
@@ -40,6 +48,10 @@ router.patch('/:id/suspend', auth, requireRole('admin'), async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
+
+// Get logged-in instructor info
+
+
 
 // Activate an instructor
 router.patch('/:id/activate', auth, requireRole('admin'), async (req, res) => {
@@ -134,6 +146,22 @@ router.get('/engagement', auth, requireRole('instructor'), async (req, res) => {
   }
 });
 
-// (Optional) Add more analytics endpoints here: course engagement, uploads, student activity
+// Update instructor's name, email, and bio
+// Update instructor profile (name, email, bio)
+router.put('/update-profile', auth, requireRole('instructor'), async (req, res) => {
+  try {
+    const { name, email, bio } = req.body;
+    const updated = await User.findByIdAndUpdate(
+      req.user._id,
+      { name, email, bio },
+      { new: true, runValidators: true, select: '-password' }
+    );
+    if (!updated) return res.status(404).json({ message: 'Instructor not found' });
+    res.json({ message: 'Profile updated successfully!', user: updated });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 
 module.exports = router;

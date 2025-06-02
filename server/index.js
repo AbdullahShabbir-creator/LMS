@@ -20,7 +20,7 @@ app.options('*', cors());
 app.use(express.json());
 
 // MongoDB Connection with fallback
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/lms';
+const MONGO_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/lms';
 console.log('Attempting to connect to MongoDB at:', MONGO_URI);
 
 // Add connection options to avoid deprecation warnings and improve connection stability
@@ -30,7 +30,7 @@ mongoose.connect(MONGO_URI, {
   serverSelectionTimeoutMS: 10000,
   connectTimeoutMS: 10000,
   socketTimeoutMS: 45000,
-  family: 4
+  family: 4     
 })
 .then(() => {
   console.log('MongoDB connected successfully');
@@ -93,7 +93,7 @@ app.use('/api/reports', reportRoutes);
 app.use('/api/quiz', quizRoutes);
 app.use('/api/mfa', mfaRoutes);
 app.use('/api/upload', uploadRoute);
-app.use('/api/lectures', lecturesRoute);
+app.use('/api/lecturesRoute', lecturesRoute);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/admin', adminRoutes);

@@ -190,6 +190,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background: linear-gradient(145deg, #2a3852, #1e2b42);
   gap: 1rem;
 }
 .course-card-header h3 {

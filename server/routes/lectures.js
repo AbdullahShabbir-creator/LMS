@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { auth, requireRole } = require('./auth');
+const { auth, requireRole } = require('../middleware/auth');
 const Course = require('../models/Course');
 
 // Add a lecture to a course
