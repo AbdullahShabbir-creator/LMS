@@ -279,7 +279,7 @@ const handleBuy = async (course) => {
         handleBuy(course);
       }}
     >
-      {course.enrolled ? 'Enrolled' : 'Buy Now'}
+      {course.enrolled ? 'Enrolled' : 'Enroll Now'}
     </button>
   </div>
 </div>

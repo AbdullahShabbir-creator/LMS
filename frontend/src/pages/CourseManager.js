@@ -239,7 +239,10 @@ async function handleSaveCourse(e) {
       ? prev.map(c => (c._id === courseId || c.id === courseId) ? updatedCourse : c)
       : [...prev, updatedCourse]);
 
-      toast.success('Course uploaded successfully');
+toast.success('Course and lectures uploaded successfully!');
+// ✅ Optional: brief delay for smoother UX before reset
+await new Promise(res => setTimeout(res, 500));
+
       // Reset form
     await fetchCourses();
     setCourses(prev => [...prev]);
@@ -384,7 +387,7 @@ async function handleSaveCourse(e) {
               display:'flex'
             }}>
               <div className="course-card-header">
-                <h3>{course.title}</h3>
+                <h3>{course.title} is course</h3>
                 <div className="course-actions">
                   <button className="icon-btn" title="Edit" onClick={() => handleEditCourse(course)}><FaEdit /></button>
                   <button className="icon-btn" title="Delete" onClick={() => handleDeleteCourse(course._id || course.id)}><FaTrash /></button>
