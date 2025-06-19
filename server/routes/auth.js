@@ -248,7 +248,7 @@ router.post('/login', async (req, res) => {
       }
       
       // Always require MFA for student and instructor roles - unless already verified
-    /*  if ((user.role === 'student' || user.role === 'instructor') && !mfaVerified) {
+      if ((user.role === 'student' || user.role === 'instructor') && !mfaVerified) {
         console.log('MFA required for', user.role);
         
         // Generate OTP code if necessary
@@ -263,7 +263,7 @@ router.post('/login', async (req, res) => {
           message: 'MFA verification required',
           user: { _id: user._id, name: user.name, email: user.email, role: user.role }
         });
-      }*/
+      }
       
       // Generate JWT token with backward compatible format
       const token = jwt.sign(
