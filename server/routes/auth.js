@@ -146,9 +146,7 @@ function auth(req, res, next) {
 // Middleware: Role check
 function requireRole(role) {
   return (req, res, next) => {
-    console.log('Role check middlewaddddre triggered');
-  
-    console.log('Required role:', role);
+   
     if (!req.user || !req.user.role) {
       return res.status(401).json({ message: 'Not authenticated' });
     }

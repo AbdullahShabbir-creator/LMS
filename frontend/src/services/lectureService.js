@@ -1,18 +1,19 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3000/api/lectures';
+const API_URL = 'http://localhost:3001/api';
 
 export const createLecture = async (lectureData) => {
   try {
     const formData = new FormData();
-    formData.append('courseName', lectureData.courseName);
-    formData.append('title', lectureData.title);
+    formData.append('courseId', lectureData.courseId);
+    formData.append('lectureTitle', lectureData.lectureTitle);
+
     formData.append('video', lectureData.video);
-    
-    const response = await axios.post(API_URL, formData, {
+
+    const response = await axios.put(`${API_URL}/instructor/uploadlecture`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
+        'Authorization': `Bearer ${localStorage.getItem('lms_token')}`
       }
     });
     
@@ -27,7 +28,7 @@ export const getLectures = async () => {
   try {
     const response = await axios.get(API_URL, {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
+        'Authorization': `Bearer ${localStorage.getItem('lms_token')}`
       }
     });
     return response.data;

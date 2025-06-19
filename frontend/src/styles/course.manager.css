@@ -148,7 +148,8 @@
 .courses-list {
   display: flex;
   flex-wrap: wrap;           /* Allow cards to wrap to next line */
-  gap: 20px;                 /* Space between cards */
+  gap: 20px;     
+  width: 100vw;            /* Space between cards */
   padding: 0;
   margin: 0;
   justify-content: flex-start; /* Align cards to the left */
@@ -163,7 +164,7 @@
   transition: box-shadow 0.3s ease;
   
   flex: 1 1 280px;       /* Flexible width with a base of 280px */
-  max-width: 320px;      /* Max width of each card */
+  width: 100%;      /* Max width of each card */
   display: flex;
   flex-direction: column;
 }
@@ -240,6 +241,7 @@
   background: #e1f5fe;
   color: #0288d1;
   padding: 4px 12px;
+  margin-right: 25px;
   border-radius: 16px;
 }
 

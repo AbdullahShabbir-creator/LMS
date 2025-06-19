@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import axios from 'axios';
 import StudentHeader from '../components/StudentHeader';
 import StudentFooter from '../components/StudentFooter';
-import { getCourseDetails } from '../services/api';
+import { getCourseDetails, markLectureComplete } from '../services/api';
 import { ToastContainer, toast } from 'react-toastify';
 import './StudentCourseView.css';
 
@@ -15,6 +16,7 @@ export default function StudentCourseView() {
   const [activeContentIndex, setActiveContentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [completedLectures, setCompletedLectures] = useState({});
 
   useEffect(() => {
     async function fetchCourseData() {
@@ -39,18 +41,42 @@ export default function StudentCourseView() {
     }
   }, [courseId]);
 
+  const handleMarkLectureComplete = async (lecture) => {
+  try {
+    const result = await markLectureComplete(courseId, lecture._id);
+
+    if (result.success) {
+      toast.success('Lecture marked as complete');
+      setCompletedLectures((prev) => ({ ...prev, [lecture._id]: true }));
+    } else {
+      toast.error(result.error || 'Failed to complete lecture');
+    }
+  } catch (err) {
+    toast.error('Unexpected error occurred');
+    console.error(err);
+  }
+};
+
   const renderContentItem = (item) => {
+    const isCompleted = completedLectures[item._id];
+
     return (
       <div className="course-video-container">
         <h3>{item.title}</h3>
         <div className="video-player">
-          <video 
-            controls 
-            src={item.videoUrl}
-            className="course-video"
-          >
+          <video controls src={item.videoUrl} className="course-video">
             Your browser does not support the video tag.
           </video>
+        </div>
+
+        <div className="lecture-controls">
+          <button
+            className={`mark-complete-btn ${isCompleted ? 'completed' : ''}`}
+            onClick={() => handleMarkLectureComplete(item)}
+            disabled={isCompleted}
+          >
+            {isCompleted ? '✅ Completed' : 'Mark as Completed'}
+          </button>
         </div>
       </div>
     );
@@ -111,13 +137,16 @@ export default function StudentCourseView() {
               {curriculum.map((item, index) => (
                 <li
                   key={item._id}
-                  className={`content-list-item ${index === activeContentIndex ? 'active' : ''}`}
+                  className={`content-list-item ${
+                    index === activeContentIndex ? 'active' : ''
+                  }`}
                   onClick={() => setActiveContentIndex(index)}
                 >
-                  <div className="content-item-icon">🎬</div>
                   <div className="content-item-details">
                     <div className="content-item-title">{item.title}</div>
-                    {item.isPreview && <span className="preview-label">Preview</span>}
+                    {item.isPreview && (
+                      <span className="preview-label">Preview</span>
+                    )}
                   </div>
                 </li>
               ))}

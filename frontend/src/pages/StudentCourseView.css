@@ -329,6 +329,31 @@
   margin: 2rem auto;
 }
 
+
+.mark-complete-btn {
+  margin-top: 10px;
+  padding: 10px 15px;
+  background-color: #0f9d58;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.mark-complete-btn.completed {
+  background-color: #c5e1a5;
+  color: black;
+  cursor: not-allowed;
+}
+
+.content-item-icon {
+  width: 25px;
+  text-align: center;
+  margin-right: 8px;
+}
+
 /* Responsive Adjustments */
 @media (max-width: 1024px) {
   .course-view-layout {

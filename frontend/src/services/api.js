@@ -2,6 +2,7 @@
 import { toast } from 'react-toastify';
 import { getToken as getAuthToken } from '../utils/auth';
 import {baseUrl} from '../config/api';
+
 // Fetch all available courses
 const token = getAuthToken();
 export const getAllCourses = async () => {
@@ -214,5 +215,111 @@ export const getPaidCourses = async () => {
   } catch (error) {
     console.error('API error fetching public courses:', error);
     return { courses: [], error: 'Network error. Please try again.' };
+  }
+};
+
+// Mark a lecture as complete
+export const markLectureComplete = async (courseId, lessonId) => {
+  try {
+    if (!token) return { error: 'Not authenticated' };
+
+    const response = await fetch(`${baseUrl}/api/lecturesRoute/progress/complete`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify({ courseId, lessonId }),
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      return { error: data.error || 'Failed to mark lecture as complete' };
+    }
+
+    const data = await response.json();
+    return { success: true, progress: data.progress };
+  } catch (error) {
+    return { error: error.message || 'Failed to mark lecture as complete' };
+  }
+};
+
+
+export const getAllProgress = async () => {
+  try {
+    const res = await fetch(`${baseUrl}/api/lecturesRoute/progress`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      credentials: 'include',
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to fetch progress');
+
+    return data.courses;
+  } catch (err) {
+    return { error: err.message };
+  }
+};
+
+
+// Fetch instructor payment requests
+export const getInstructorPaymentRequests = async () => {
+  const token = getAuthToken();
+  if (!token) {
+    return { error: 'No token found. Please log in.' };
+  }
+
+  try {
+    const res = await fetch(`${baseUrl}/api/instructor/payment-requests`, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      console.error('Server error response:', errorData);
+      return { error: `Status ${res.status}` };
+    }
+
+    const data = await res.json();
+    return { requests: data };
+  } catch (err) {
+    console.error('Error fetching payment requests:', err);
+    return { error: 'Failed to load payment requests' };
+  }
+};
+
+// Approve a payment
+export const approveInstructorPayment = async (courseId, studentId) => {
+  const token = getAuthToken();
+  if (!token) {
+    return { error: 'No token found. Please log in.' };
+  }
+
+  try {
+    const res = await fetch(`${baseUrl}/api/instructor/approve-payment`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ courseId, studentId })
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      console.error('Server error response:', errorData);
+      return { error: `Failed to approve payment: ${res.status}` };
+    }
+
+    return { success: true };
+  } catch (err) {
+    console.error('Error approving payment:', err);
+    return { error: 'Network error while approving payment' };
   }
 };

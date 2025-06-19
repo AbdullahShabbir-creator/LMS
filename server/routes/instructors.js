@@ -3,8 +3,16 @@ const router = express.Router();
 const User = require('../models/User');
 const { auth, requireRole } = require('../middleware/auth');
 const Course = require('../models/Course');
+const multer = require('multer');
+const cloudinary = require('../utils/cloudinary');
 const Earning = require('../models/Earning');
-
+const storage = multer.memoryStorage();
+const upload = multer({ 
+  storage,
+  limits: {
+    fileSize: 100 * 1024 * 1024, // 100MB limit
+  }
+});
 // Get all instructors (admin only)
 router.get('/', auth, requireRole('admin'), async (req, res) => {
   try {
@@ -14,7 +22,58 @@ router.get('/', auth, requireRole('admin'), async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
-router.get('/me', auth, requireRole('instructor'), async (req, res) => {
+router.get('/payment-requests', auth, requireRole('instructor'), async (req, res) => {
+  try {
+    // Find all courses taught by this instructor
+
+    const courses = await Course.find({ instructor: req.user._id })
+      .populate('paymentRequests.student', 'name email')
+      .select('title paymentRequests');
+
+    res.json(courses);
+  } catch (err) {
+    console.error('Error fetching payment requests:', err);
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+});
+router.post('/approve-payment', auth,requireRole('instructor'), async (req, res) => {
+  try {
+    const { courseId, studentId } = req.body;
+
+    const course = await Course.findOne({ _id: courseId, instructor: req.user._id });
+
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found or unauthorized' });
+    }
+
+    // Update isPaid to true for this student
+    const studentEntry = course.students.find(s => s.student.toString() === studentId);
+    if (!studentEntry) {
+      return res.status(404).json({ message: 'Student not enrolled in course' });
+    }
+
+    studentEntry.isPaid = true;
+
+    // Optional: update paymentRequest status too
+    const reqEntry = course.paymentRequests.find(r => r.student.toString() === studentId);
+    if (reqEntry) {
+      reqEntry.status = 'approved';
+      reqEntry.processedAt = new Date();
+    }
+
+    await course.save();
+
+    res.json({ message: 'Payment approved successfully' });
+
+  } catch (err) {
+    console.error('Approve payment error:', err);
+    res.status(500).json({ message: 'Server error approving payment' });
+  }
+});
+
+
+
+router.get('/me', auth, async (req, res) => {
   try {
     const instructor = await User.findById(req.user._id).select('-password');
     if (!instructor) return res.status(404).json({ message: 'Instructor not found' });
@@ -146,22 +205,98 @@ router.get('/engagement', auth, requireRole('instructor'), async (req, res) => {
   }
 });
 
-// Update instructor's name, email, and bio
+// Update instructor's name, email, and bio    
 // Update instructor profile (name, email, bio)
-router.put('/update-profile', auth, requireRole('instructor'), async (req, res) => {
-  try {
-    const { name, email, bio } = req.body;
-    const updated = await User.findByIdAndUpdate(
-      req.user._id,
-      { name, email, bio },
-      { new: true, runValidators: true, select: '-password' }
-    );
-    if (!updated) return res.status(404).json({ message: 'Instructor not found' });
-    res.json({ message: 'Profile updated successfully!', user: updated });
-  } catch (err) {
-    res.status(500).json({ message: 'Server error' });
+// routes/instructor.js or similar file
+
+router.put(
+  '/update-profile',
+  upload.single('avatar'),
+  auth,
+  
+  async (req, res) => {
+    try {
+      const { name, email, bio } = req.body;
+      const updateData = { name, email, bio };
+
+      // Handle avatar image upload to Cloudinary
+      console.log(req.file)
+      if (req.file) {
+        const fileBuffer = req.file.buffer;
+        const mimeType = req.file.mimetype;
+        const base64 = fileBuffer.toString('base64');
+        const dataURI = `data:${mimeType};base64,${base64}`;
+
+        const result = await cloudinary.uploader.upload(dataURI, {
+          folder: 'profile', // your Cloudinary folder
+        });
+
+        updateData.avatar = result.secure_url; // set Cloudinary image URL
+      }
+
+      const updated = await User.findByIdAndUpdate(
+        req.user._id,
+        updateData,
+        { new: true, runValidators: true }
+      );
+
+      if (!updated) {
+        return res.status(404).json({ message: 'Instructor not found' });
+      }
+
+      res.json({ message: 'Profile updated successfully!', user: updated });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Server error' });
+    }
   }
-});
+);
 
 
-module.exports = router;
+router.put(
+  '/uploadlecture',
+  upload.single('video'),
+  auth,
+  async (req, res) => {
+    try {
+      const { courseId, lectureTitle } = req.body;
+
+      if (!req.file) {
+        return res.status(400).json({ message: 'Video file is required' });
+      }
+
+      const fileBuffer = req.file.buffer;
+      const mimeType = req.file.mimetype;
+      const base64 = fileBuffer.toString('base64');
+      const dataURI = `data:${mimeType};base64,${base64}`;
+
+      // Upload video to Cloudinary
+      const result = await cloudinary.uploader.upload(dataURI, {
+        folder: 'lectures',
+        resource_type: 'video'
+      });
+
+      // Update course with new lecture
+      const course = await Course.findById(courseId);
+      if (!course) {
+        return res.status(404).json({ message: 'Course not found' });
+      }
+
+      course.curriculum.push({
+        title: lectureTitle,
+        
+        videoUrl: result.secure_url,
+        videoPublicId: result.public_id,
+      });
+
+      await course.save();
+
+      res.status(201).json({ message: 'Lecture added successfully', course });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Server error' });
+    }
+  }
+);
+
+module.exports = router;  

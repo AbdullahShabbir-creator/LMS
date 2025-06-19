@@ -2,10 +2,19 @@ const express = require('express');
 const router = express.Router();
 const Progress = require('../models/Progress');
 const Notification = require('../models/Notification');
+const multer = require('multer');
+const cloudinary = require('../utils/cloudinary');
 const Course = require('../models/Course');
+const User = require('../models/User');
 const ensureAuth = require('../middleware/ensureAuth');
 const { auth, requireRole } = require('../middleware/auth');
-
+const storage = multer.memoryStorage();
+const upload = multer({ 
+  storage,
+  limits: {
+    fileSize: 100 * 1024 * 1024, // 100MB limit
+  }
+});
 // Attach authentication middleware to all student routes
 router.use(ensureAuth);
 
@@ -16,10 +25,12 @@ router.get('/enrolled-courses', async (req, res) => {
     if (!userId) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
-    
-    // Find courses where the student is in the students array
-    const courses = await Course.find({ students: userId }).populate('instructor', 'name email');
+
+    const courses = await Course.find({ 'students.student': userId }).populate('instructor', 'name email');
   
+if(!courses){
+  res.json({error:'Courses not found'})
+}
     res.json({ courses });
   } catch (err) {
     console.error('Error fetching enrolled courses:', err);
@@ -49,54 +60,68 @@ router.get('/purchased-courses', async (req, res) => {
 });
 
 // Enroll in a course (for free courses)
-router.post('/enroll/:courseId',auth, async (req, res) => {
+router.post('/enroll/:courseId', auth, async (req, res) => {
   try {
-    const userId = req.user?.id || req.user?._id;
+    const userId = req.user?.id || req.user?._id;   
     const courseId = req.params.courseId;
-    
-    
+
     if (!userId) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
-    
+
     const course = await Course.findById(courseId);
-    
+
     if (!course) {
       return res.status(404).json({ error: 'Course not found' });
     }
-    
-    // Check if already enrolled
-    if (course.students.includes(userId)) {
+
+    if (course.students.some(s => s.student.equals(userId))) {
       return res.status(400).json({ error: 'Already enrolled in this course' });
     }
-    
-    // Add student to 9Dthe course
-    course.students.push(userId);
+
+    // Add student
+    course.students.push({ student: userId, isPaid: false });
+
+    // Add course to student
+    await User.findByIdAndUpdate(userId, {
+      $addToSet: { courses: course._id }
+    });
+
     await course.save();
-    
-    // Create initial progress record
-    /*await Progress.findOneAndUpdate(
-      { user: userId, courseId },
-      { 
-        user: userId,
-        courseId,
-        progress: 0,
-        lastAccessed: new Date(),
-        details: []
-      },
-      { upsert: true, new: true }
-    );
-    */
+
+    // Create progress
+    const totalLectures = course.curriculum.length;
+    const lessonDetails = course.curriculum.map(lecture => ({
+      lessonId: lecture._id,
+      lessonTitle: lecture.title,
+      completed: false,
+      timeSpent: 0
+    }));
+
+    await Progress.create({
+      user: userId,
+      courseId: course._id,
+      courseTitle: course.title,
+      completed: 0,
+      total: totalLectures,
+      percent: 0,
+      lastLesson: null,
+      details: lessonDetails,
+    });
+
     res.json({ 
       success: true, 
       message: 'Successfully enrolled in course',
-      course
+      course 
     });
+
   } catch (err) {
     console.error('Error enrolling in course:', err);
     res.status(500).json({ error: 'Failed to enroll in course' });
   }
 });
+
+
 
 // --- Progress Details API endpoint for lesson-by-lesson ---
 // GET /api/student/progress/:courseId
@@ -283,6 +308,54 @@ router.get('/notifications/prefs', async (req, res) => {
     res.json(user.notificationPrefs || {});
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch notification preferences' });
+  }
+});
+
+
+// PATCH /api/student/profile - Update student profile
+
+router.patch('/profile', upload.single('avatar'), async (req, res) => {
+  try {
+    const userId = req.user?.id || req.user?._id;
+    
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    const { name, email, bio } = req.body;
+    if (name) user.name = name;
+    if (email) user.email = email;     
+    if (bio !== undefined) user.bio = bio;
+
+    if (req.file) {
+      // Upload to Cloudinary and store URL (or use local file path for dev)
+      user.avatar = `/uploads/${req.file.filename}`; // replace with Cloudinary URL if applicable
+    }
+
+    await user.save();
+
+    res.json({ message: 'Profile updated', user });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Something went wrong' });
+  }
+});
+
+
+// Get all courses for a student by their ID
+router.get('/my-courses', auth, async (req, res) => {
+  try {
+    const userId = req.user?.id || req.user?._id;
+
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const courses = await Course.find({ students: userId });
+
+    res.json({ success: true, courses });
+  } catch (err) {
+    console.error('Error fetching student courses:', err);
+    res.status(500).json({ error: 'Failed to get courses' });
   }
 });
 

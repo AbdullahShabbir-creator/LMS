@@ -54,10 +54,11 @@ export default function StudentProfile() {
           const token = getAuthToken();
           if (!token) return;
           
-          const res = await axios.get('/api/student/profile', {
+          const res = await axios.get('http://localhost:3001/api/instructor/me', {
             headers: { Authorization: `Bearer ${token}` }
           });
           if (res.data) {
+            console.log(res.data)
             setProfileData(res.data);
           }
         } catch (error) {
@@ -172,6 +173,7 @@ export default function StudentProfile() {
       ...profileData
     });
     setEditMode(true);
+    setShowEditModal(true)
   };
 
   const handleSave = async () => {
@@ -182,8 +184,9 @@ export default function StudentProfile() {
         setSaveStatus('failed');
         return;
       }
+      console.log(editableProfileData)
       
-      await axios.put('/api/student/profile', editableProfileData, {
+      await axios.put('http://localhost:3001/api/instructor/update-profile', editableProfileData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setProfileData(editableProfileData);
@@ -198,6 +201,7 @@ export default function StudentProfile() {
   };
 
   const handleCancel = () => {
+    setShowEditModal(false)
     setEditMode(false);
     setEditableProfileData({});
   };
@@ -251,7 +255,7 @@ export default function StudentProfile() {
     <div className="profile-container">
       <StudentHeader minimal={false} showPrevious={true} />
       <main className="profile-content">
-        <motion.section initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #23252622', padding: 24, display: 'flex', flexDirection: 'column', gap: 18 }}>
+        <motion.section initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} style={{ background: '#fff', boxShadow: '0 2px 12px #23252622', padding: 24, display: 'flex', flexDirection: 'column', gap: 18 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
             <img src={profileData.avatar} alt="avatar" style={{ width: 80, height: 80, borderRadius: '50%', border: '3px solid #43cea2', background: '#e3e6f3' }} />
             <div style={{ flex: 1 }}>
@@ -268,7 +272,7 @@ export default function StudentProfile() {
           </div>
         </motion.section>
         {/* Course Overview */}
-        <motion.section initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #23252622', padding: 24 }}>
+        <motion.section initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} style={{ background: '#fff',  boxShadow: '0 2px 12px #23252622', padding: 24 }}>
           <div style={{ fontWeight: 700, fontSize: 18, color: '#185a9d', marginBottom: 14 }}>Course Overview</div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 18 }}>
             {enrolledCourses.map((course) => (
@@ -280,25 +284,23 @@ export default function StudentProfile() {
             ))}
           </div>
         </motion.section>
-        {/* Progress Summary */}
-        <motion.section initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #23252622', padding: 24 }}>
+        {profileData&&(
+        <motion.section initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} style={{ background: '#fff',  boxShadow: '0 2px 12px #23252622', padding: 24 }}>
           <div style={{ fontWeight: 700, fontSize: 18, color: '#185a9d', marginBottom: 14 }}>Progress Summary</div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 18 }}>
             <div style={{ background: '#f6f7fb', borderRadius: 10, padding: 16, minWidth: 220, flex: 1, boxShadow: '0 1px 4px #23252611', display: 'flex', flexDirection: 'column', gap: 7 }}>
-              <span style={{ fontWeight: 600, color: '#185a9d', fontSize: 16 }}>Completed Courses</span>
-              <div style={{ color: '#43cea2', fontSize: 14 }}>{completedCourses.length}</div>
+              <span style={{ fontWeight: 600, color: '#185a9d', fontSize: 16 }}>Total Courses</span>
+              <div style={{ color: '#43cea2', fontSize: 14 }}>{profileData?.courses?.length}</div>
               {completedCourses.map(c => (
                 <div key={c.id} style={{ color: '#888', fontSize: 14, marginTop: 4 }}> {c.title}</div>
               ))}
             </div>
-            <div style={{ background: '#f6f7fb', borderRadius: 10, padding: 16, minWidth: 220, flex: 1, boxShadow: '0 1px 4px #23252611', display: 'flex', flexDirection: 'column', gap: 7 }}>
-              <span style={{ fontWeight: 600, color: '#185a9d', fontSize: 16 }}>Certificates/Badges</span>
-              <div style={{ color: '#43cea2', fontSize: 14 }}>{completedCourses.map(c => c.badge).join(', ') || 'None yet'}</div>
-            </div>
+           
           </div>
         </motion.section>
+)}
         {/* Notification Preferences */}
-        <motion.section initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9 }} style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #23252622', padding: 24 }}>
+        <motion.section initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9 }} style={{ background: '#fff', boxShadow: '0 2px 12px #23252622', padding: 24 }}>
           <div style={{ fontWeight: 700, fontSize: 18, color: '#185a9d', marginBottom: 14 }}>Notification Preferences</div>
           <div style={{ display: 'flex', gap: 18, flexWrap: 'wrap' }}>
             <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 500 }}><FaBell /> Grades <input type="checkbox" name="grades" checked={notificationPrefs.grades} onChange={handleNotificationChange} /></label>
@@ -307,7 +309,7 @@ export default function StudentProfile() {
           </div>
         </motion.section>
         {/* Privacy Settings */}
-        <motion.section initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.0 }} style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px #23252622', padding: 24 }}>
+        <motion.section initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.0 }} style={{ background: '#fff',  boxShadow: '0 2px 12px #23252622', padding: 24 }}>
           <div style={{ fontWeight: 700, fontSize: 18, color: '#185a9d', marginBottom: 14 }}>Privacy Settings</div>
           <div style={{ display: 'flex', gap: 18, flexWrap: 'wrap' }}>
             <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 500 }}><FaEye /> Public Profile <input type="checkbox" name="publicProfile" checked={privacy.publicProfile} onChange={handlePrivacyChange} /></label>

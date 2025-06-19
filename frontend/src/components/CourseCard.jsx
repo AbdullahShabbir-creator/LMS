@@ -1,19 +1,17 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import './CourseCard.css'; // CSS specific to CourseCard
+import './CourseCard.css'; // Style as you like
 
-const CourseCard = ({ course, isUnlocked, onCardClick, onViewClick, onBuyClick, index }) => {
+const CourseCard = ({ course, onCardClick, index, buttonText }) => {
   const {
     title,
     category,
     instructor,
     image,
     students,
-    price,
-    enrolled,
     rating,
-    isFree,
-    preview
+    preview,
+    price
   } = course;
 
   const animation = {
@@ -27,30 +25,23 @@ const CourseCard = ({ course, isUnlocked, onCardClick, onViewClick, onBuyClick, 
       className="course-card"
       {...animation}
       whileHover={{ scale: 1.02 }}
+      onClick={() => onCardClick(course)}
     >
- 
+     
+      
       <div className="course-card-content">
         <h3 className="course-card-title">{title}</h3>
         <p className="course-card-category">{category}</p>
         <p className="course-card-instructor">By {instructor?.name || 'Unknown'}</p>
         <p className="course-card-rating">⭐ {rating || 4.0}</p>
-        <p className="course-card-students">{students} students</p>
-        <p className="course-card-preview">{preview}</p>
+        <p className="course-card-students">{students?.length || 0} students</p>
+
+        {preview && <p className="course-card-preview">{preview}</p>}
 
         <div className="course-card-actions">
-          {enrolled || isUnlocked ? (
-            <button className="view-button" onClick={() => onViewClick(course)}>
-              View Course
-            </button>
-          ) : isFree ? (
-            <button className="enroll-button" onClick={() => onBuyClick(course)}>
-              Enroll Free
-            </button>
-          ) : (
-            <button className="buy-button" onClick={() => onBuyClick(course)}>
-              Buy for ${price}
-            </button>
-          )}
+          <button className={`course-button ${buttonText === 'Pay Now' ? 'buy-button' : 'view-button'}`}>
+            {buttonText === 'Pay Now' && price ? `${buttonText} (${price})` : buttonText}
+          </button>
         </div>
       </div>
     </motion.div>

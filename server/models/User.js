@@ -4,11 +4,14 @@ const bcrypt = require('bcryptjs');
 const UserSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
+    bio: { type: String, default: '' }, // ✅ Ensure bio exists here
   password: { type: String, required: true },
   role: { type: String, enum: ['student', 'instructor', 'admin'], default: 'student' },
+  avatar:{type:String,default:''},
   status: { type: String, enum: ['active', 'suspended'], default: 'active' },
   resetToken: String,
   resetTokenExpiry: Date,
+  courses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }],
   // Settings fields
   publicProfile: { type: Boolean, default: true },
   leaderboard: { type: Boolean, default: true },

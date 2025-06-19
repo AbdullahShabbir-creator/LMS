@@ -1,68 +1,33 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import InstructorHeader from '../components/InstructorHeader';
 import InstructorFooter from '../components/InstructorFooter';
 import { motion } from 'framer-motion';
 import { FaSearch, FaThLarge, FaThList } from 'react-icons/fa';
+import { toast } from 'react-toastify';
 import '../styles/instructor.modern.css';
 import '../styles/leactures.modern.css';
-
 const DEMO_CATEGORIES = [
   'All',
-  'Web Development',
-  'Machine Learning',
-  'Data Science',
-  'Information Security',
-  'Other'
+  'Programming',
+  'General',
+  'Design',
+  'Business',
+  'IT & Software',
+  'Other',
+  'Personal Development'
 ];
 
-const DEMO_LEACTURES = [
-  {
-    id: 1,
-    title: 'React Basics',
-    category: 'Web Development',
-    videoUrl: 'https://www.youtube.com/embed/dGcsHMXbSOA',
-    desc: 'Learn the basics of React.js including components, props, and state.'
-  },
-  {
-    id: 2,
-    title: 'Intro to Machine Learning',
-    category: 'Machine Learning',
-    videoUrl: 'https://www.youtube.com/embed/GwIo3gDZCVQ',
-    desc: 'A beginner friendly introduction to Machine Learning concepts.'
-  },
-  {
-    id: 3,
-    title: 'Data Science Crash Course',
-    category: 'Data Science',
-    videoUrl: 'https://www.youtube.com/embed/ua-CiDNNj30',
-    desc: 'Dive into Data Science with this crash course.'
-  },
-  {
-    id: 4,
-    title: 'Cybersecurity Essentials',
-    category: 'Information Security',
-    videoUrl: 'https://www.youtube.com/embed/2e--2c4phXI',
-    desc: 'Essential concepts and practices for Information Security.'
-  },
-  {
-    id: 5,
-    title: 'Advanced React Patterns',
-    category: 'Web Development',
-    videoUrl: 'https://www.youtube.com/embed/kK_Wqx3RnHk',
-    desc: 'Take your React skills to the next level with advanced patterns.'
-  },
-  // ... more demo data
-];
-
-// Assign a color for each category
 const CATEGORY_COLORS = {
   'All': 'linear-gradient(90deg, #43cea2 0%, #185a9d 100%)',
-  'Web Development': 'linear-gradient(90deg, #6a11cb 0%, #2575fc 100%)',
-  'Machine Learning': 'linear-gradient(90deg, #f7971e 0%, #ffd200 100%)',
-  'Data Science': 'linear-gradient(90deg, #00c6ff 0%, #0072ff 100%)',
-  'Information Security': 'linear-gradient(90deg, #ff5858 0%, #f09819 100%)',
+  'Programming': 'linear-gradient(90deg, #6a11cb 0%, #2575fc 100%)',
+  'General': 'linear-gradient(90deg, #f7971e 0%, #ffd200 100%)',
+  'Design': 'linear-gradient(90deg, #ff6a00 0%, #ee0979 100%)',         // Orange to Pink
+  'Business': 'linear-gradient(90deg, #11998e 0%, #38ef7d 100%)',       // Teal to Green
+  'IT & Software': 'linear-gradient(90deg, #2c3e50 0%, #4ca1af 100%)',  // Dark Blue to Light Blue
   'Other': 'linear-gradient(90deg, #232526 0%, #6c63ff 100%)',
+  'Personal Development': 'linear-gradient(90deg, #ff512f 0%, #dd2476 100%)' // Red to Purple
 };
+
 
 function LeactureCard({ leacture }) {
   return (
@@ -95,18 +60,52 @@ function LeactureCard({ leacture }) {
             }}
           />
           <div className="leacture-card-content">
-            <h4 className="leacture-title" style={{ fontSize: '1.18rem', fontWeight: 700, color: '#fff', marginBottom: 8 }}>{leacture.title}</h4>
-            <div className="leacture-category" style={{
-              fontWeight: 500,
-              fontSize: 13,
-              marginBottom: 8,
-              borderRadius: 8,
-              padding: '3px 10px',
-              display: 'inline-block',
-              background: CATEGORY_COLORS[leacture.category] || '#6c63ff',
-              color: '#fff'
-            }}>{leacture.category}</div>
-            <p className="leacture-desc" style={{ color: '#e0e0e0', fontSize: 15, marginBottom: 0 }}>{leacture.desc}</p>
+            <h4
+              className="leacture-title"
+              style={{ fontSize: '1.18rem', fontWeight: 700, color: '#fff', marginBottom: 6 }}
+            >
+              {leacture.title}
+            </h4>
+            {/* New Course Title Badge */}
+            <div
+              style={{
+                fontWeight: 600,
+                fontSize: 12,
+                marginBottom: 8,
+                padding: '2px 8px',
+                backgroundColor: '#43cea2cc',
+                color: '#232526',
+                borderRadius: 8,
+                display: 'inline-block',
+                fontStyle: 'italic',
+                userSelect: 'none',
+              }}
+              title={`This video belongs to the course: ${leacture.courseTitle}`}
+            >
+              Course: {leacture.courseTitle}
+            </div>
+
+            <div
+              className="leacture-category"
+              style={{
+                fontWeight: 500,
+                fontSize: 13,
+                marginBottom: 8,
+                borderRadius: 8,
+                padding: '3px 10px',
+                display: 'inline-block',
+                background: CATEGORY_COLORS[leacture.category] || '#6c63ff',
+                color: '#fff',
+              }}
+            >
+              {leacture.category}
+            </div>
+            <p
+              className="leacture-desc"
+              style={{ color: '#e0e0e0', fontSize: 15, marginBottom: 0 }}
+            >
+              {leacture.desc || 'No description available.'}
+            </p>
           </div>
         </div>
       </div>
@@ -114,17 +113,56 @@ function LeactureCard({ leacture }) {
   );
 }
 
+
 export default function Leactures() {
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [category, setCategory] = useState('All');
   const [search, setSearch] = useState('');
   const [layout, setLayout] = useState('grid');
 
+  useEffect(() => {
+    async function fetchCourses() {
+      setLoading(true);
+      try {
+        const token = localStorage.getItem('lms_token');
+        const res = await fetch('http://localhost:3001/api/courses', {
+          headers: { Authorization: `Bearer ${token}` },
+          credentials: 'include'
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setCourses(data);
+        } else {
+          toast.error('Failed to fetch courses');
+        }
+      } catch (err) {
+        toast.error('Network error');
+      }
+      setLoading(false);
+    }
+    fetchCourses();
+  }, []);
+
+  // Flatten curriculum from all courses
+  const allLeactures = useMemo(() => {
+    return courses.flatMap(course =>
+      course.curriculum.map(video => ({
+        ...video,
+        category: course.category,
+        desc: course.description,
+        courseTitle: course.title
+      }))
+    );
+  }, [courses]);
+
   const filteredLeactures = useMemo(() =>
-    DEMO_LEACTURES.filter(l =>
+    allLeactures.filter(l =>
       (category === 'All' || l.category === category) &&
-      (l.title?.toLowerCase() || '').includes(search.toLowerCase()) || (l.desc || '').toLowerCase().includes(search.toLowerCase())
+      ((l.title?.toLowerCase() || '').includes(search.toLowerCase()) ||
+       (l.desc?.toLowerCase() || '').includes(search.toLowerCase()))
     ),
-    [category, search]
+    [allLeactures, category, search]
   );
 
   return (
@@ -161,6 +199,7 @@ export default function Leactures() {
           >
             Video Leactures
           </motion.h2>
+
           <div className="leactures-controls">
             <div className="leactures-categories">
               {DEMO_CATEGORIES.map((cat) => (
@@ -180,6 +219,7 @@ export default function Leactures() {
                 </button>
               ))}
             </div>
+
             <div className="leactures-search-layout">
               <div className="leactures-searchbar">
                 <FaSearch style={{ marginRight: 6, color: '#6c63ff' }} />
@@ -209,12 +249,16 @@ export default function Leactures() {
               </div>
             </div>
           </div>
+
           <div className={`leactures-list ${layout}`}>
-            {filteredLeactures.length === 0 ? (
+            {loading ? (
+              <div className="no-leactures">Loading...</div>
+            ) : filteredLeactures.length === 0 ? (
               <div className="no-leactures">No leactures found.</div>
             ) : (
               filteredLeactures.map(leacture => (
-                <LeactureCard key={leacture.id} leacture={leacture} />
+                
+                <LeactureCard key={leacture._id} leacture={leacture} />
               ))
             )}
           </div>

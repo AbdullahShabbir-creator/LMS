@@ -387,7 +387,7 @@ await new Promise(res => setTimeout(res, 500));
               display:'flex'
             }}>
               <div className="course-card-header">
-                <h3>{course.title} is course</h3>
+                <h3>{course.title}</h3>
                 <div className="course-actions">
                   <button className="icon-btn" title="Edit" onClick={() => handleEditCourse(course)}><FaEdit /></button>
                   <button className="icon-btn" title="Delete" onClick={() => handleDeleteCourse(course._id || course.id)}><FaTrash /></button>

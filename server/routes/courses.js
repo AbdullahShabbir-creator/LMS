@@ -45,7 +45,7 @@ router.get('/paid', async (req, res) => {
 });
 
 // Get all courses (admin only)
-router.get('/', auth, requireRole('admin'), async (req, res) => {
+router.get('/', auth, async (req, res) => {
   try {
     const courses = await Course.find().populate('instructor', 'name email');
     res.json(courses);
@@ -57,7 +57,7 @@ router.get('/', auth, requireRole('admin'), async (req, res) => {
 // (Optional) Get a single course by ID
 router.get('/:id', auth, async (req, res) => {
   try {
-  //  console.log(req.params.id)
+
     const course = await Course.findById(req.params.id).populate('instructor', 'name email');
     if (!course) return res.status(404).json({ message: 'Course not found' });
    
@@ -160,37 +160,36 @@ router.post('/purchase/:id', auth, requireRole('student'), async (req, res) => {
   try {
     const course = await Course.findById(req.params.id);
     if (!course) return res.status(404).json({ message: 'Course not found' });
-    if (course.isFree) return res.status(400).json({ message: 'Course is already free' });
-    if (course.students.includes(req.user._id)) return res.status(400).json({ message: 'Already purchased' });
-    
-    // Add student directly to the course (for simplicity)
-    course.students.push(req.user._id);
-    await course.save();
-    
-    // Create initial progress record
-    const Progress = require('../models/Progress');
-    await Progress.findOneAndUpdate(
-      { user: req.user._id, courseId: course._id },
-      { 
-        user: req.user._id,
-        courseId: course._id,
-        progress: 0,
-        lastAccessed: new Date(),
-        details: []
-      },
-      { upsert: true, new: true }
+
+    if (course.isFree) return res.status(400).json({ message: 'This course is free. Please enroll directly.' });
+
+
+    const existingRequest = course.paymentRequests.find(
+      r => r.student.equals(req.user._id) && r.status === 'pending'
     );
-    
-    // Return success
-    res.json({ 
-      success: true, 
-      message: 'Course purchased successfully. You now have access to this course.' 
+
+    if (existingRequest) {
+      return res.status(400).json({ message: 'You already have a pending payment request for this course.' });
+    }
+
+    course.paymentRequests.push({
+      student: req.user._id,
+      name: req.body.name,
+      phone: req.body.phone,
+      reference: req.body.reference
     });
+
+    await course.save();
+
+    res.json({ success: true, message: 'Payment request submitted. Await instructor approval.' });
   } catch (err) {
-    console.error('Error purchasing course:', err);
+    console.error('Error creating payment request:', err);
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 });
+
+
+
 
 // Instructor/admin approves or rejects a payment request
 router.patch('/:courseId/approve-payment/:requestId', auth, async (req, res) => {

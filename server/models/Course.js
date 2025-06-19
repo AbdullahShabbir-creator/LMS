@@ -14,7 +14,12 @@ const paymentRequestSchema = new mongoose.Schema({
 const courseSchema = new mongoose.Schema({
   title: { type: String, required: true },
   instructor: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  students: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+students: [
+  {
+    student: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    isPaid: { type: Boolean, default: false }
+  }
+],
   category: { type: String, required: true },
   description: { type: String },
   price: { type: Number, default: 0 }, // 0 means free

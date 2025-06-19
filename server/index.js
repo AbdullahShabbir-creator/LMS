@@ -9,15 +9,15 @@ const app = express();
 // Middleware
 app.use(cors({
   origin: 'http://localhost:3000',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS','PATCH'],
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// Handle preflight requests
+// Handle preflight requests  
 app.options('*', cors());
 
-app.use(express.json());
+app.use(express.json());  
 
 // MongoDB Connection with fallback
 const MONGO_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/lms';
