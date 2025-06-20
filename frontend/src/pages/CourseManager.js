@@ -3,7 +3,8 @@ import InstructorHeader from '../components/InstructorHeader';
 import InstructorFooter from '../components/InstructorFooter';
 import CurriculumBuilder from '../components/CurriculumBuilder';
 import BulkVideoUpload from '../components/BulkVideoUpload'
-
+import axios from 'axios'
+import DeleteModal from './DeleteModal';
 import ReactPlayer from 'react-player';
 import { FaPlus, FaTrash, FaEdit, FaVideo, FaEye } from 'react-icons/fa';
 import { toast } from 'react-toastify';
@@ -59,6 +60,9 @@ async function uploadVideoToBackend(file, courseId, lectureTitle) {
 
 export default function CourseManager() {
   const [courses, setCourses] = useState([]);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+const [courseToDelete, setCourseToDelete] = useState(null);
+
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ 
     title: '', 
@@ -112,9 +116,29 @@ export default function CourseManager() {
     return () => clearInterval(interval);
   }, [fetchCourses]);
 
-  async function handleDeleteCourse(id) {
+  
+const handleDeleteCourse = async (id) => {
+ 
+  try {
+    // Send DELETE request to your backend
+    const response = await axios.delete(`http://localhost:3001/api/courses/${id}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}` // or use your authHeader util
+      }
+    });
+
+    // Optionally show a success message
+    toast.success(response.data.message || 'Course deleted successfully');
+
+    // Remove course from local state (assuming you have setCourses)
+    setCourses(prevCourses => prevCourses.filter(course => (course._id || course.id) !== id));
     
+  } catch (error) {
+    console.error(error);
+    const errMsg = error.response?.data?.message || 'Failed to delete course';
+    toast.error(errMsg);
   }
+};
 
   // Edit course (basic: load into form)
   function handleEditCourse(course) {
@@ -278,10 +302,22 @@ await new Promise(res => setTimeout(res, 500));
 
   return (
     <div className="course-manager-root">
+      
       <InstructorHeader />
+ {showDeleteModal && (
+  <DeleteModal 
+    open={showDeleteModal}
+    onClose={() => setShowDeleteModal(false)}
+    onConfirm={async () => {
+      await handleDeleteCourse(courseToDelete);
+      setShowDeleteModal(false);
+    }}
+  />
+)}
       <main className="course-manager-main">
         <h2 className="course-manager-title">My Courses</h2>
         <button className="add-course-btn" onClick={handleAddCourse}><FaPlus /> Create New Course</button>
+             
         {showForm && (
           <form className="course-form" onSubmit={handleSaveCourse}>
             <input name="title" placeholder="Course Title" value={form.title} onChange={handleFormChange} required />
@@ -382,6 +418,7 @@ await new Promise(res => setTimeout(res, 500));
         )}
         
         <div className="courses-list">
+          
           {courses.map(course => (
             <div className="course-card" key={course._id || course.id} style={{
               display:'flex'
@@ -390,7 +427,10 @@ await new Promise(res => setTimeout(res, 500));
                 <h3>{course.title}</h3>
                 <div className="course-actions">
                   <button className="icon-btn" title="Edit" onClick={() => handleEditCourse(course)}><FaEdit /></button>
-                  <button className="icon-btn" title="Delete" onClick={() => handleDeleteCourse(course._id || course.id)}><FaTrash /></button>
+                  <button className="icon-btn" title="Delete"  onClick={() => {
+    setCourseToDelete(course._id || course.id);
+    setShowDeleteModal(true);
+  }}><FaTrash /></button>
                 </div>
               </div>
               <p className="course-desc">{course.description}</p>
@@ -404,8 +444,12 @@ await new Promise(res => setTimeout(res, 500));
             </div>
           ))}
         </div>
+ 
+
       </main>
+
       <InstructorFooter />
+       
     </div>
   );
 }

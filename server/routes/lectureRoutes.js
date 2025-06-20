@@ -77,7 +77,7 @@ router.get('/',ensureAuth, async (req, res) => {
 // Delete a lecture
 router.delete('/:id', ensureAuth, async (req, res) => {
   try {
-   
+      
     const lecture = await Lecture.findById(req.params.id);
     if (!lecture) return res.status(404).json({ message: 'Lecture not found' });
     

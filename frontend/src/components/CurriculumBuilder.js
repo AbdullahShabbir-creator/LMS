@@ -24,9 +24,9 @@ export default function CurriculumBuilder({ curriculum, setCurriculum }) {
   }
 
   function handleDeleteLecture(id) {
-    setCurriculum(curriculum.filter(l => l.id !== id));
+    setCurriculum(curriculum.filter(l => l._id !== id));
   }
-
+  
   function handleTogglePreview(id) {
     setCurriculum(curriculum.map(l => l.id === id ? { ...l, isPreview: !l.isPreview } : l));
   }
@@ -64,7 +64,7 @@ export default function CurriculumBuilder({ curriculum, setCurriculum }) {
           {provided => (
             <div ref={provided.innerRef} {...provided.droppableProps} className="curriculum-list-dnd">
               {curriculum.map((lec, idx) => (
-                <Draggable key={lec.id} draggableId={lec.id.toString()} index={idx}>
+                <Draggable key={lec.id} draggableId={lec.id} index={idx}>
                   {provided => (
                     <div
                       className={`curriculum-item-dnd${lec.isPreview ? ' preview' : ''}`}
@@ -86,7 +86,7 @@ export default function CurriculumBuilder({ curriculum, setCurriculum }) {
                       <button 
                         type="button"
                         className="delete-lecture-btn" 
-                        onClick={() => handleDeleteLecture(lec.id)} 
+                        onClick={() => handleDeleteLecture(lec._id)} 
                         title="Delete"
                         aria-label="Delete lecture"
                       >

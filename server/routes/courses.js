@@ -145,7 +145,7 @@ router.put('/:id', auth, requireRole('instructor'), async (req, res) => {
 });
 
 // Delete a course (admin)
-router.delete('/:id', auth, requireRole('admin'), async (req, res) => {
+router.delete('/:id', auth, async (req, res) => {
   try {
     const course = await Course.findByIdAndDelete(req.params.id);
     if (!course) return res.status(404).json({ message: 'Course not found' });
